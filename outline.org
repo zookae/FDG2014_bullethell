@@ -1,0 +1,125 @@
+* thesis
+** low-level tuning AI to help design
+** formalize design goals + show process to automatically achieve
+   ultimately helps designers move to collaborating with AI systems to balance roles and contributions
+   opens questions in how to represent _process_ of designing for AI to collaborate - player metrics as one example
+* related work
+** DDA
+   rule-based: hunicke, magerko, thue, el-nasr
+   -- con: need to manually specify
+   us
+   -- generalize automatically and tune directly
+   -- could take rules and fine-tune how they work to best achieve design goals
+** EC + ML
+   EC: stanley/hastings, shaker, yannakakis
+   ML: missura, yu
+   -- pro: automatically fit to player or player cluster
+   -- con: little design control
+   -- con: overfitting risk
+   us
+   -- go from optimizing to also exploring to find best
+   -- can take same systems but build in process of seeking best alternatives to try (for individuals, groups, or whole population)
+* game
+** why arcade?
+   many parameters that influence one another
+   wave-based play to test and vary
+   actions -> less planning / strategizing
+   scoring -> goals are explicit
+** design optimization
+*** performance objective
+    target: player rate of being hit
+    vary: bullet speed, size, fire rate
+    -> seek to achieve ``flow'' by fixed rate of success/failure
+*** subjective response
+    target: player comparisons of whether controls were better
+    vary: thrust, drag
+    -> seek to get players to say ``better'' as often as possible (ideally reach point of no improvement)
+* active design optimization
+** active learning
+   acquisition functions - how to evaluate what parameters to try next
+   need different ones for regression + classification
+   -- regression: minimize ``error'', here from ideal performance number
+   -- classification: minimize misclassification, here prediction of player response
+*** regression
+**** variance
+     focus on uncertain
+**** PI
+     only picking based on probability
+**** EI
+     expectation over all possible outcomes to weight more important
+**** UCB
+     bandit optimization process with running model of certainty around parameters attempted
+*** classification
+**** entropy
+     pick by notion of how well-spread out
+**** QBB
+     go by disagreement among models (either final choice or probability of outcomes)
+** gaussian processes
+   [could cut for the most part, neither a contribution nor essential for understanding it]
+** ksvm
+   [ditto - main point is KSVM doesn't have regression model that captures variance]
+** ?neuroevol?
+* experiments
+** methods
+   (1) random collection of data
+   -- (a) simulation
+   -- (b) humans
+   (2) train model on collected data
+   two domains
+   (1) regression - vary bullet speed, size, firing rate to get player hit 6 times per wave
+   (2) preference - vary control thrust + drag to get player to rate as ``better'' over time
+** study 1 - regression - results
+*** simulation description
+    probabilistic model of skill response to parameters
+    player: set of skills and single level of skill error
+    -- each skill randomly selected from normal distribution, spread by skill error
+    comparison: 
+    -- skill-response is normal distribution of skill difference from parameter + some error
+    -- overall response is average of those responses across skills, along with base failure rate
+    --> models player as having 3 separate skills to handle different enemy parameters, but with fixed amount of ``slip-up''
+    data pool:
+    -- grid of evenly spaced points in parameter space for each bullet parameter
+*** simulation results
+    all 3 methods do quite well
+    EI asmpytotes to slightly better results
+*** human study results
+    UCB and EI are only ones to do well
+    -- UCB remains at consistently high performance
+    -- EI gradually gets worse over time
+    why?
+    -- variance and PI do not capture exploration and thus have difficulty finding good results
+    -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
+** study 2 - preference - results
+*** simulation description
+    cf pref model paper
+    player model: preferences for two parameters and shared error on preference (range of variability to tolerate)
+    comparison
+    -- underlying preference value is cumulative normal distribution of difference of parameter from desired spread by error term
+    -- response for a given parameter is squared error number, compared between two parameter settings
+    -- parameters combined by checking choices for both
+    -- four outcomes
+    (1) small difference (below error level) means ``no difference''
+    --> if both are nodiff, then nodiff
+    --> if one is nodiff, then give response from other
+    (2) positive difference for newer gives ``better''
+    --> both better or one better + one nodiff
+    (3) negative difference gives ``worse''
+    --> both worse or one worse + one nodiff
+    (4) one better + one worse --> ``neither''
+    captures same range of responses as in-game settings used for experiment
+*** simulation results
+    GP random beats KSVM random -> GP is better able to model domain
+    GP entropy shows best trend -> focus on finding out where problems are
+    QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
+*** human study results
+    GP random beats KSVM random -> GP is better able to model domain
+    no strong winners, domain was very hard
+    KSVM entropy is slightly better 
+    QBB models don't perform 
+    --> QBB + KSVM results suggest consistent domain but complex underlying model
+* discussion
+** AI for low-level design
+** applications
+   automating small aspects of design
+   opening new ways of using design tools to seek out goals
+   employing in automated game generation to guide process

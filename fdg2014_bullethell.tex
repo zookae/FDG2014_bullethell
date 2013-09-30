@@ -120,14 +120,19 @@ In both studies, Bayesian optimization affords automatic exploration-exploitatio
 \section{Related Work}
 
 A game design AI system synthesizes elements from several existing paradigms for the use of AI in game design. Procedural content generation examines how an AI can create content within a space of parameters.  Dynamic difficulty adjustment concerns itself with adapting game mechanics in real time to changes in users. By contrast, we focus on the problem of learning a model of how game mechanics impact player behavior. 
-Unlike player modeling, our goal is an AI system that {\em actively} adjusts game mechanics to explore the design space for that game both to achieve a given design objective and understand how that design space works. 
+Unlike player modeling, our goal is an AI system that {\em actively} adjusts game mechanics to explore the design space for that game both to achieve a given design objective and understand how that design space works. That is, we model how a set of design parameters relates to desired outcomes such as performance in a game or preference for game settings.
 
 
 % % % key ideas for us: learning over time rather than in batch mode; explore-exploit trade-off; generalization to many tuning techniques; conceptually about ``learning design space'' rather than just picking instances for a goal; minimize designer need to know system parameters while still providing flexibility to tune; probabilistic model means modeling (learning) and generation (sampling) come from unified souce
 %Automating low-level game design tuning relates to techniques for adapting content based on player behavior or preference information.
+
 % % hand-crafted DDA models
-Approaches to game tailoring and adaptation combine a player modeling technique with a content adaptation or generation method. Many early efforts employed a game-specific player model using vector of attributes (e.g. skills or use of content) and reactively selected new content to guide players toward a desired level of skill or intended level of performance. Hunicke and Chapman \cite{hunicke2004:dda} track the average and variance of player damage and inventory levels and employ a hand-crafted policy to adjust levels of enemies or powerups. 
-Systems by Magerko et al. \cite{magerko2006:isat}, El-Nasr \cite{seifel-nasr2007:mirage}, and Thue et al. \cite{thue2007:storytell-pm} model players as vectors of skills, personality traits, or pre-defined ``player types'' and select content to fit players using rule-based approaches. In contrast, an interactive Bayesian optimization approach generalizes across games, automatically determines how complex the player model should be, and does not require designers to tune a set of rules (or other parameters) to generate content while retaining designer control over the algorithm objectives. 
+Approaches to game tailoring and adaptation combine a player modeling technique with a content adaptation or generation method. 
+Many early efforts employed a game-specific player model using vector of attributes (e.g. skills or use of content) and reactively selected new content to guide players toward a desired level of skill or intended level of performance. 
+Hunicke and Chapman \cite{hunicke2004:dda} track the average and variance of player damage and inventory levels and employ a hand-crafted policy to adjust levels of enemies or powerups. 
+% % vector models
+Systems by Magerko et al. \cite{magerko2006:isat}, El-Nasr \cite{seifel-nasr2007:mirage}, and Thue et al. \cite{thue2007:storytell-pm} model players as vectors of skills, personality traits, or pre-defined ``player types'' and select content to fit players using rule-based approaches. 
+In contrast, an interactive Bayesian optimization approach generalizes across games, automatically determines how complex the player model should be, and does not require designers to tune a set of rules (or other parameters) to generate content while retaining designer control over the algorithm objectives. 
 
 % % simulation approaches
 % % AZ: unneeded as we're interested in adaptation, not generation w/o
@@ -144,14 +149,23 @@ Systems by Magerko et al. \cite{magerko2006:isat}, El-Nasr \cite{seifel-nasr2007
 % % ML/EC based models that have no principled exploration-exploitation trade-off --> our system is trying to ``learn'' space of options
 Evolutionary computing and machine learning provide frameworks for modeling players and optimizing game parameters to achieve adaptation goals.
 \todo[inline]{Don't just enumerate, pull out the principles, like in the preceding paragraph. This paragraph should be shorter.}
-\cite{hastings2009:gar} track player use of weapons and use neuro-evolution to generate new weapons based on those expressed preferences.
-\cite{pedersen2009:smb} employ neuro-evolution to model reported frustration, challenge, and fun with a multi-layer perceptron. 
-\cite{shaker2010:platformer-gen} use this model to generate platformer game levels through an exhaustive search process. 
-\cite{yannakakis2009:playermodel} employs the same techniques in an augmented reality game setting, attempting to optimize player satisfaction.
-\cite{missura2009:dda} create player clusters from training data and train a linear regression models for game difficulty within each cluster in an arcade game. During adaptation, new player clusters are predicted from early play data using a support vector machine (SVM) and difficulty is set using the cluster-specific regression model.
-\cite{yu2011:minboredom} perform a similar process of player modeling and adaptation by clustering players and optimizing game parameters employing a large-margin SVM approach that minimizes player boredom or frustration in a level-based action game. 
+Hastings et al. \cite{hastings2009:gar}, Shaker et al. \cite{pedersen2009:smb, shaker2010:platformer-gen}, and Yannakakis et al. \cite{yannakakis2009:playermodel} model player preferences using neuro-evolutionary techniques and optimize the output of these models to select potential game parameters.
+%\cite{hastings2009:gar} track player use of weapons and use neuro-evolution to generate new weapons based on those expressed preferences.
+%\cite{pedersen2009:smb} employ neuro-evolution to model reported frustration, challenge, and fun with a multi-layer perceptron. 
+%\cite{shaker2010:platformer-gen} use this model to generate platformer game levels through an exhaustive search process. 
+%\cite{yannakakis2009:playermodel} employs the same techniques in an augmented reality game setting, attempting to optimize player satisfaction.
+Missura et al. \cite{missura2009:dda} and Yu and Trawick \cite{yu2011:minboredom} cluster players, train regression or classification models to predict player responses to game content, and choose sets of parameters that optimize the desired player response outcomes.
+%\cite{missura2009:dda} create player clusters from training data and train linear regression models for game difficulty within each cluster in an arcade game. During adaptation, new player clusters are predicted from early play data using a support vector machine (SVM) and difficulty is set using the cluster-specific regression model.
+%\cite{yu2011:minboredom} perform a similar process of player modeling and adaptation by clustering players and optimizing game parameters employing a large-margin SVM approach that minimizes player boredom or frustration in a level-based action game. 
+Our approach formalizes these intuitions by making the design objective explicit and enabling the AI system to test variations of model parameters to create the best possible model.
+The approaches above focus on optimizing game parameters to players but risk ignoring alternative sets of parameters that have not yet been tried but have promise to give a better outcome.
+We incorporate this trade-off of exploitation---optimizing to a given objective---and exploration---attempting new designs that may be better, but are currently unknown.
 
-Unlike these \todo[inline]{what are these? Entire related work section?} approaches we integrate feature selection into the model selection process, automatically balance model complexity with fit (rather than requiring parameter tuning\todo[inline]{don't understand}), and automatically trade off exploration of possible parameter settings against exploitation, rather than only exploiting through optimization. Conceptually, the interactive Bayesian optimization approach captures a full design tuning process of testing many possible parameter settings, incrementally updating an understanding of the design space, and selectively seeking points in the space that will be most informative to improving the design space model while still meeting design objectives. We seek an approach that is intentionally attempting to acquire design knowledge relevant to designer-specified goals, without requiring a designer have deep familiarity with either the player modeling or generation algorithms. In \cite{khaled2013:pcg-metaphor}'s framework our system combines the analysis of gameplay data of a PCG EXPERT with solving design tasks (adaptation) as a DESIGNER ASSISTANT. 
+
+%Unlike these \todo[inline]{what are these? Entire related work section?} approaches we integrate feature selection into the model selection process, automatically balance model complexity with fit (rather than requiring parameter tuning\todo[inline]{don't understand}), and automatically trade off exploration of possible parameter settings against exploitation, rather than only exploiting through optimization. 
+%Conceptually, the interactive Bayesian optimization approach captures a full design tuning process of testing many possible parameter settings, incrementally updating an understanding of the design space, and selectively seeking points in the space that will be most informative to improving the design space model while still meeting design objectives. 
+%We seek an approach that is intentionally attempting to acquire design knowledge relevant to designer-specified goals, without requiring a designer have deep familiarity with either the player modeling or generation algorithms. 
+%In \cite{khaled2013:pcg-metaphor}'s framework our system combines the analysis of gameplay data of a PCG EXPERT with solving design tasks (adaptation) as a DESIGNER ASSISTANT. 
 
 
 %\cite{yu2012:prefix-based} CF w/fixed alternatives, hard to scale to continuous parameter spaces
@@ -187,42 +201,63 @@ Arcade games serve as an ideal starting domain for low-level parameter tuning:
 \begin{itemize}
 \item There are a number of parameters that can potentially interfere with each other: size and speed of enemies and enemy bullets, rate of enemy fire, player speed, player rate of fire, etc.
 \item The game can be played in a series of waves, enabling our system to naturally test game parameter settings and gather player feedback.
-\item Action-oriented gameplay reduces the complexities of player long-term planning and strategizing.
-\item A scoring system based on defeating enemies and avoiding enemy fire.
+\item Action-oriented gameplay reduces the complexity of player long-term planning and strategizing.
+\item A scoring system makes gameplay goals and progress clear, unlike domains involving puzzle-solving or aesthetic enjoyment of a game world or setting.
 \end{itemize}
 %
 %An arcade-style game enables our system to use a series of waves to test game parameter settings and gather feedback from the player, iteratively refining the parameter settings to a given design objective. Further, the action-oriented gameplay reduces the complexities of player long-term planning and strategizing, serving as an ideal starting domain for low-level tuning.
 %In our game players gain points for defeating enemies and lose points when hit by enemies. Players are encouraged to avoid enemy fire by dodging enemy attacks or destroying enemy ships to (temporarily) reduce the number of incoming attacks.
 %
-In the case of shoot-`em-up games, we are interested in two different types of game design goals: abstract goals for player performance \mytodo{such as}, and getting good user ratings on the feel of the controls.
+In the case of shoot-`em-up games, we are interested in two different types of game design goals: abstract goals for player performance such as player success rates or score achieved, and getting good user ratings on the feel of the controls.
 
 % % enemy params
 We implemented a shoot-`em-up arcade game based on space ship combat, as shown in Figure~\ref{fig:shmup}.
 During each wave a series of enemies appear that fire bullets at the player. 
-We focused on varying three parameters governing enemy behavior: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. Increasing bullet size requires the player to move more carefully to avoid bullets. Faster bullets require quicker player reflexes to dodge incoming fire. More rapid firing rates increase the volume of incoming fire. Together these three parameters govern how much players must move to dodge enemy attacks, in turn challenging player reflexes. As with controls, getting approximate settings for these parameters is easy, but fine-tuning them for a desired level of difficulty can be challenging. Our performance adaptation experiment had the system set enemy bullet size, speed, and firing rate to minimize the difference between player performance and designer-specified target performance.
+We focused on varying three parameters governing enemy behavior: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
+Increasing bullet size requires the player to move more carefully to avoid bullets. 
+Faster bullets require quicker player reflexes to dodge incoming fire. 
+More rapid firing rates increase the volume of incoming fire. 
+Together these three parameters govern how much players must move to dodge enemy attacks, in turn challenging player reflexes. 
+Getting approximate settings for these parameters is easy, but fine-tuning them for a desired level of difficulty can be challenging. 
+%Our performance adaptation experiment had the system set enemy bullet size, speed, and firing rate to minimize the difference between player performance and designer-specified target performance.
 
 % % control params
 Player controls are limited to shooting at enemies and moving the ship. 
-Ship movement is governed by two controllable parameters: drag and thrust. Drag is the ``friction'' applied to a ship that decelerates the moving ship at a constant rate when it is moving---larger values cause the ship to stop drifting in motion sooner. Thrust is the ``force'' a player movement press applies to accelerate the ship---larger values cause the ship to move more rapidly when the player presses a key to move. 
+Ship movement is governed by two controllable parameters: drag and thrust. 
+Drag is the ``friction'' applied to a ship that decelerates the moving ship at a constant rate when it is moving---larger values cause the ship to stop drifting in motion sooner. 
+Thrust is the ``force'' a player movement press applies to accelerate the ship---larger values cause the ship to move more rapidly when the player presses a key to move. 
 %
-Combinations of thrust and drag are easy to tune to rough ranges of playability. However, the precise values needed to ensure the player has the appropriate controls are difficult to find as player movement depends on how enemies attack and individual player preferences for control sensitivity (much like mouse movement sensitivity). 
+Combinations of thrust and drag are easy to tune to rough ranges of playability. 
+However, the precise values needed to ensure the player has the appropriate controls are difficult to find as player movement depends on how enemies attack and individual player preferences for control sensitivity (much like mouse movement sensitivity). 
 %Our preference-learning experiment had the system set drag and thrust for the player while attempting to maximize player preference for a set of controls.
-Our system attempted to set drag and thrust for the player while attempting to maximize player preference for a set of controls.
+%Our system attempted to set drag and thrust for the player while attempting to maximize player preference for a set of controls.
+
+Our experiments investigate how well an AI system can learn the right parameter settings to achieve a desired level of player performance (in terms of rate of being hit by enemies) or a most preferred set of controls (in terms of player subjective responses).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Interactive Bayesian Optimization}
+\section{Interactive Bayesian Optimization} % -> active learning?
 
-We use Interactive Bayesian Optimization (IBO) to model an iterative game design process informed by playtesting, i.e., player feedback. IBO is itself a form of sequential Bayesian optimization where data points are user feedback gathered in interaction of the AI with the user \cite{brochu2010:thesis}.
+\todo[inline]{needs to be gutted and replaced with high-level process and goals}
+% % (1) AL - process of finding picking untested data points to get best model of the world (in classification which is good/bad; regression is how hard player is hit)
+% %			maps to: pick best set of game parameters within a desired paramter space to get best model of player responses and best quality results
+% %		methods tested: regression = ~; classification = ~; point is there are many ways of trading off alternatives that lead to different potential outcomes
+% % (2) GP - nonparameteric model with build-in selection processes to avoid overfitting; good for regression problems and allows variety of tuning methods
+% % (3) KSVM - alternative model that allows similar tuning but does not make explicit explore-exploit tradeoff
+
+We use Interactive Bayesian Optimization (IBO) to model an iterative game design process informed by playtesting, i.e., player feedback. 
+IBO is itself a form of sequential Bayesian optimization where data points are user feedback gathered in interaction of the AI with the user \cite{brochu2010:thesis}.
 Sequential Bayesian optimization optimizes a function through iteratively testing a sequence of points, each one selected by some algorithm based on previous points. 
-Two functions are required: (1)~the \textit{objective function} that maps inputs to outputs; and (2) the \textit{acquisition function} that maps potential inputs to their value for optimizing the objective function output. 
+Two functions are required: (1)~the \textit{objective function} that maps inputs to outputs; and (2)~the \textit{acquisition function} that maps potential inputs to their value for optimizing the objective function output. 
 %
 In our application of IBO to \mytodo{game design space learning}, we employ Gaussian processes (GPs) for the objective function---the game design model from parameters to player behavior---and a modified expected improvement acquisition function---trading exploration of the design space against exploitation of designs known to achieve the design objective.
 
 Gaussian processes are a non-parametric modeling technique able to capture complex non-linear relationships within a data set.
-%, automatically adjust model complexity to data, and \mytodo{integrate out} \todo{don't understand} parameters without user intervention \cite{rasmussen2006}. %%% MOR: THIS FELT REDUNDANT WITH BELOW.
-Intuitively, non-parametric models allow an infinite number of variables to account for the data before selecting only the subset needed to explain a given set of observations. In practice, this leads to models that automatically become more complex to fit a data set as needed. 
+%, automatically adjust model complexity to data, and \mytodo{integrate out} \todo{don't understand} parameters without user intervention \cite{rasmussen2006}. 
+%%% MOR: THIS FELT REDUNDANT WITH BELOW.
+Intuitively, non-parametric models allow an infinite number of variables to account for the data before selecting only the subset needed to explain a given set of observations. 
+In practice, this leads to models that automatically become more complex to fit a data set as needed. 
 Bayesian formulations of GP regression and classification automatically trade off between model complexity and fit to a data set, avoiding over-fitting and poor generalization problems that occur with other optimization approaches. 
 Bayesian model specifications of GPs also require reduced or simplified parameter specification from users---in this case designers.
 %allow parameters of the model to be integrated out, simplifying their use by requiring less user specification. We employ GPs to leverage the benefits of non-linear mapping from inputs to outputs, automatic complexity adjustment with data collection, and reduced or eliminated parameter specification from users.
@@ -270,7 +305,10 @@ We note that optimization may be performed using any-time algorithms (such as DI
 \subsection{Active Learning}
 
 \mytodo{need transition. Remind us what AL is for.}
-Active learning (AL) is an approach to machine learning problems with a large set of unlabeled instances where a computer asks a human to provide information about given instances to learn a model of the instances as a whole \cite{settles2012:al-book}. AL is well suited to our application where the space of game parameterizations is very large and information can only be gained through the expensive process of having a human play and provide feedback about a game instance. Acquisition functions specify how a given AL algorithm weights potential instances to test based on a goal of optimizing the objective function. In our case, the GP regression model seeks to minimize the difference between desired and actual player performance and the GP preference model seeks to find the highest latent value instance.
+Active learning (AL) is an approach to machine learning problems with a large set of unlabeled instances where a computer asks a human to provide information about given instances to learn a model of the instances as a whole \cite{settles2012:al-book}. 
+AL is well suited to our application where the space of game parameterizations is very large and information can only be gained through the expensive process of having a human play and provide feedback about a game instance. 
+Acquisition functions specify how a given AL algorithm weights potential instances to test based on a goal of optimizing the objective function.
+In our case, the GP regression model seeks to minimize the difference between desired and actual player performance and the GP preference model seeks to find the highest latent value instance.
 
 Many possible acquisition functions exist, varying in how the functions balance the exploration-exploitation trade-off guiding how locally-tethered the search for large objective function values is \cite{settles2012:al-book}. Expected improvement (EI) is an acquisition function that balances the value of unseen instances against the uncertainty regarding their values. EI integrates over all possible results to get an average-case estimate of the result, rather than seeking a best-case (or worst-case) scenario. We employ a modified EI function that incorporates a slack parameter ($\xi \ge 0$) to control the relative weighting of exploration and exploitation goals \cite{lizotte2008}:
 
@@ -289,11 +327,15 @@ Intuitively, $Z$ is the noise-scaled difference between the test point $x$ and t
 
 
 
-\section{Experiment}
+\section{Experiments}
 % % goal = assess model ability to:
 % % % regression = fit player to target behavior
 % % % preference = get controls that "suit" player --> Q: how know when "good enough"?
-In this section we describe two empirical human studies we conducted. The first study examines the use of GP regression to find and continually adjust game parameter settings to achieve a designer-specified level of performance. The second study examines the use of GP preference modeling to optimize controls to player preferences. We show our approach, compared to random sampling: improves a player model's predictive power with the same sampling budget, does equally well or better at achieving a design objective, and improves the ratio of positive to negative responses to sample points in preference learning. Random sampling is the common standard used to evaluate the efficacy of AL models for improving model fits for a given data budget and is similar to A/B testing approaches that capture large amounts of data before acting on the results \cite{settles2012:al-book}.
+In this section we describe two empirical human studies we conducted. 
+The first study examines the use of GP regression to find and continually adjust game parameter settings to achieve a designer-specified level of performance. 
+The second study examines the use of GP preference modeling to optimize controls to player preferences. 
+We show our approach, compared to random sampling: improves a player model's predictive power with the same sampling budget, does equally well or better at achieving a design objective, and improves the ratio of positive to negative responses to sample points in preference learning.
+Random sampling is the common standard used to evaluate the efficacy of AL models for improving model fits for a given data budget and is similar to A/B testing approaches that capture large amounts of data before acting on the results \cite{settles2012:al-book}.
 
 
 \subsection{Methods}
@@ -311,6 +353,9 @@ In the control optimization study a GP preference model was fit to predict the u
 
 
 \subsection{Results}
+
+% % 
+
 
 \begin{table}[ht]
 \centering
