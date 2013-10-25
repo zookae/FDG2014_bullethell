@@ -1,16 +1,34 @@
 * thesis
 ** low-level tuning AI to help design
+   Design tools that automate time-consuming parts of process. 
+   Help formalize playtesting process and notions of design goals.
+   Reduce expense of playtesting, particularly in cases where testing is done remotely and with ``lower-resolution'' data (not specifics of everything done).
 ** formalize design goals + show process to automatically achieve
    ultimately helps designers move to collaborating with AI systems to balance roles and contributions
    opens questions in how to represent _process_ of designing for AI to collaborate - player metrics as one example
 * related work
-** DDA
+** design support
+   hard constraints: nelson, smith, butler, bauer, shaker, g smith
+   -- con: requires design to be integrated fully with tool to analyze
+   -- con: typically limited to high levels of abstraction
+   us
+   -- focus on small-scale changes and tuning
+   -- core to many processes and requires humans in the loop for many design goals (e.g. control ``feel'')
+** game languages / tools
+   for AI: vgdl, Twine, smith (VF), dormans, treanor
+   -- good starting point for formalizing design
+   -- con: not yet exploring how to effective to _support_ design
+   us
+   -- aiming to automate minor changes in design for designer use if the goals can be specified in specific metrics
+   -- [future]: extend to allow looser specification of design goals, not single metrics
+   -- [future]: leverage players via richer tuning feedback
+** DDA [cut]
    rule-based: hunicke, magerko, thue, el-nasr
    -- con: need to manually specify
    us
    -- generalize automatically and tune directly
    -- could take rules and fine-tune how they work to best achieve design goals
-** EC + ML
+** EC + ML [cut?]
    EC: stanley/hastings, shaker, yannakakis
    ML: missura, yu
    -- pro: automatically fit to player or player cluster
@@ -19,41 +37,105 @@
    us
    -- go from optimizing to also exploring to find best
    -- can take same systems but build in process of seeking best alternatives to try (for individuals, groups, or whole population)
+* design goal taxonomy
+  ``what'' to design for
+  ``how'' to do design = AI playtesting role
+  --> bogost ``how to do things with videogames''
+
+  Game designers typically set out design goals for a project and measure a developing game against those goals [GGJ paper].
+  Professional designers have specified a variety of frameworks for game design. 
+  Approaches vary widely in their level of abstraction and evaluations specified. 
+  We propose a rough taxonomy to help contrast these approaches and begin to understand what types of design metrics can be measured to help designers of these games. Our taxonomy is not intended to be exhaustive or complete. Instead, it is inteded to serve as a guide to the development of better game design support tools and techniques. 
+  Also note that any given design project often pursues different design goals both over the life of the project and at any given point in development of a game.
+** BEHAVIORAL / BEHAVIORIST
+   Behavioral design goals focus on low-level details of player activity in a game.
+   Gamification [hamari?],  approaches design for real-world or work-related activity engagement and outcomes.
+   Competitive game designers often define a variety of metrics to describe how balanced the changes of two or more sides in a game are [REF: jaffee restricted play; elias].
+   Behavioral game design approaches can be characterized by an emphasis on what _actions_ a player takes in the game and what game-related _outcomes_ result.
+   Goal metrics generalize to optimizing a metric relating to how often players arrive in a particular outcome state. Example metrics include the number of players that complete a game (up to a point), the frequency of players joining or leaving a game, or the ratio of players winning when playing on the first or second turn.
+** COGNITIVE / EXPERIENTIAL
+   Experiential design goals emphasize the emotional and cognitive impact of games on players.
+   Fullerton et al. [REF] emphasize a high-level ``play-centric'' approach [explain!] targeting how players emotionally perceive a game.
+   Serious games [mcgonigal], and game-based learning [?] target player learning outcomes or engagement in real-world activities.
+   At a lower level, Swink [REF] describes a framework for understanding a game's ``feel''---the experience of using game controls for action in a game.
+   Experiential goal metrics optimize how players report their game experience.
+   Example metrics include player preferences for a given game level or set of controls, how well players learn a concept embedded in a game design (e.g. addition in a math game; economics in business simulation), or whether players feel emotionally moved by a game story. 
+   Note that unlike the behavioral metrics above, experiential metrics are not necessarily quanitifiable in terms of player behavior. Subjective player responses are instead a grounding source of information.
+** EXPRESSIVE / AUTHORIAL
+   Expressive design goals focus on how well a game structure satisfies the game designer's need to convey a message or explore an idea.
+   Anthropy has led a call for more mass participation in games as a means to explore new thematic content and investigate personal experiences [REF].
+   Bogost [REF: how to do] describes a host of purposes for games that emphasize the intent of an author, ranging from ``snapshot'' games capturing a moment in life to ``proceduralist'' games that employ rules to convey artistic meaning.
+   Expressive goal metrics target how well an intended system is represented through mechanics.
+   Behavioral and Experiential design goals focus on the activities and experience of game _players_. Expressive goals instead focus on the experience of a game _author_. 
+      Others emphasize 
+   play-centric - fullerton
+   gamification metrics - hamari?
+   expressive design - 
+   competitive design / balance - elias
+   control - swink
+   learning metrics - d cook
+   learning - mcgonigal
+** -- this needs to be at the end --
+   The goals above characterize a range of specific aspects of a game to design for. 
+   Shared across these approaches is an emphasis on particular game outcome states (demonstrated skill mastery, game duration, etc.). However, other parts of design are orthogonal to these metrics. For example, a notion of ``progression'' applies to many of these metrics---``flow'' over the course of the game, relative balance over time, or learning/mastery over time.
+
+   Traces of player activity are important for facets such as learning trajectories or balance over time.
+   The design taxonomy here helps compliment and extend earlier work in understanding approaches to modeling players [REF: smith et al] and efforts to define generic level design metrics [REF: liapis].
+   Many, if not all, of these design goals require further refinement to better understand the many levels 
+   --> issue: interactions among metrics
+   --> issue: non-markovian + vary over time
+   Note that many of these metrics have a great deal of nuance when considered over time. For example, a ``flow'' state is defined as a game that continually becomes more difficult to match player skill, yet many designs emphasize varying levels of perceived difficulty. Introducing a period of low difficulty followed by higher difficulty in order to give the player a sense of power and struggle introduces nuance to these models---
+** design optimization
+*** performance objective
+    example of Behavioral design objective
+    --
+    target: player rate of being hit
+    vary: bullet speed, size, fire rate
+    -> seek to achieve ``flow'' by fixed rate of success/failure
+*** subjective response
+    example of experiential design objective
+    --
+    target: player comparisons of whether controls were better
+    vary: thrust, drag
+    -> seek to get players to say ``better'' as often as possible (ideally reach point of no improvement)
 * game
 ** why arcade?
    many parameters that influence one another
    wave-based play to test and vary
    actions -> less planning / strategizing
    scoring -> goals are explicit
-** design optimization
-*** performance objective
-    target: player rate of being hit
-    vary: bullet speed, size, fire rate
-    -> seek to achieve ``flow'' by fixed rate of success/failure
-*** subjective response
-    target: player comparisons of whether controls were better
-    vary: thrust, drag
-    -> seek to get players to say ``better'' as often as possible (ideally reach point of no improvement)
 * active design optimization
+  Working to reduce the playtesting burden and provide general approach to design optimization.
+  Draw from active learning---techniques that try to guide the process of which design change to make next to optimize the design.
+  Models trade-off between trying new designs that might work (exploration) and fine-tuning designs that are known to work (exploitation).
+  Aim in this paper is to convey the intuitions behind techniques; detailed mathematical treatments are cited.
 ** active learning
    acquisition functions - how to evaluate what parameters to try next
    need different ones for regression + classification
    -- regression: minimize ``error'', here from ideal performance number
    -- classification: minimize misclassification, here prediction of player response
 *** regression
+    techniques to use when trying to get a specific quantity
+    examples: how often a player wins; how many times an event (dependent on player action) happens in the game; proportion of players who learn a game concept
 **** variance
-     focus on uncertain
-**** PI
+     picking based on uncertainty
+     trying out designs that are poorly understood (hard to guess what will happen)
+**** PI [X]
      only picking based on probability
+     trying only designs expected to do well (after minor tweak)
 **** EI
      expectation over all possible outcomes to weight more important
+     weighting outcomes by how good they are, not just how likely
 **** UCB
      bandit optimization process with running model of certainty around parameters attempted
+     starting out by exploring very different designs, then honing in on best designs. take into account that some designs might be okay, but could be great
 *** classification
 **** entropy
      pick by notion of how well-spread out
+     want to pick designs highly unlike others
 **** QBB
      go by disagreement among models (either final choice or probability of outcomes)
+     take different perspectives on design by only using random parts of previous known design outcomes; if you had a room of copies of yourself who only knew randomly different parts of the past, what would they most agree/disagree on as a good decision?
 ** gaussian processes
    [could cut for the most part, neither a contribution nor essential for understanding it]
 ** ksvm
