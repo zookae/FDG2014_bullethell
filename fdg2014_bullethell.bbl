@@ -1,5 +1,11 @@
 \begin{thebibliography}{10}
 
+\bibitem{bauer2013:rrt-generation}
+A.~W. Bauer, S.~Cooper, and Z.~Popovic.
+\newblock Automated redesign of local playspace properties.
+\newblock In {\em 8th International Conference on the Foundations of Digital
+  Games}, 2013.
+
 \bibitem{brochu2010:thesis}
 E.~Brochu.
 \newblock {\em Interactive Bayesian optimization: learning user preferences for
@@ -11,6 +17,19 @@ W.~Chu and Z.~Ghahramani.
 \newblock Preference learning with gaussian processes.
 \newblock In {\em Proceedings of the 22nd International Conference on Machine
   learning}, pages 137--144. ACM, 2005.
+
+\bibitem{fullerton2008:playcentric}
+T.~Fullerton, C.~Swain, and S.~Hoffman.
+\newblock {\em Game design workshop: a playcentric approach to creating
+  innovative games}.
+\newblock Morgan Kaufmann, 2008.
+
+\bibitem{harrison2013:scrabble-retention}
+B.~Harrison and D.~L. Roberts.
+\newblock Analytics-driven dynamic game adaption for player retention in
+  scrabble.
+\newblock In {\em IEEE Conference on Computational Intelligence in Games},
+  pages 1--8. IEEE, 2013.
 
 \bibitem{hastings2009:gar}
 E.~Hastings, R.~K. Guha, and K.~Stanley.
@@ -29,6 +48,13 @@ D.~R. Jones, C.~D. Perttunen, and B.~E. Stuckman.
 \newblock Lipschitzian optimization without the lipschitz constant.
 \newblock {\em Journal of Optimization Theory and Applications},
   79(1):157--181, 1993.
+
+\bibitem{liapis2013:rank-based-interactive-evol}
+A.~Liapis, H.~P. Mart{\i}nez, J.~Togelius, and G.~N. Yannakakis.
+\newblock Adaptive game level creation through rank-based interactive
+  evolution.
+\newblock In {\em IEEE Conference on Computational Intelligence in Games},
+  volume~4, pages 71--78. Springer, 2013.
 
 \bibitem{lizotte2008}
 D.~J. Lizotte.
@@ -92,11 +118,25 @@ G.~N. Yannakakis, M.~Maragoudakis, and J.~Hallam.
 \newblock {\em IEEE Transactions on Systems, Man and Cybernetics, Part A:
   Systems and Humans}, 39(6):1165--1175, 2009.
 
+\bibitem{yu2013:storyeti}
+H.~Yu and M.~O. Riedl.
+\newblock Personalized interactive narratives via sequential recommendation of
+  plot points.
+\newblock {\em IEEE Trans. Computational Intelligence and AI in Games},
+  forthcoming, 2013.
+
 \bibitem{yu2011:minboredom}
 H.~Yu and T.~Trawick.
 \newblock Personalized procedural content generation to minimize frustration
   and boredom based on ranking algorithm.
 \newblock In {\em 7th AAAI Conference on Artificial Intelligence and
   Interactive Digital Entertainment}, 2011.
+
+\bibitem{zook2012:tf}
+A.~Zook and M.~O. Riedl.
+\newblock A temporal data-driven player model for dynamic difficulty
+  adjustment.
+\newblock In {\em 8th AAAI Conference on Artificial Intelligence and
+  Interactive Digital Entertainment}, 2012.
 
 \end{thebibliography}

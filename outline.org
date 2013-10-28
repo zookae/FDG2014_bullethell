@@ -17,7 +17,7 @@
 ** game languages / tools
    for AI: vgdl, Twine, smith (VF), dormans, treanor
    -- good starting point for formalizing design
-   -- con: not yet exploring how to effective to _support_ design
+   -- con: not yet exploring how to effectively _support_ design
    us
    -- aiming to automate minor changes in design for designer use if the goals can be specified in specific metrics
    -- [future]: extend to allow looser specification of design goals, not single metrics
@@ -37,73 +37,6 @@
    us
    -- go from optimizing to also exploring to find best
    -- can take same systems but build in process of seeking best alternatives to try (for individuals, groups, or whole population)
-* design goal taxonomy
-  ``what'' to design for
-  ``how'' to do design = AI playtesting role
-  --> bogost ``how to do things with videogames''
-
-  Game designers typically set out design goals for a project and measure a developing game against those goals [GGJ paper].
-  Professional designers have specified a variety of frameworks for game design. 
-  Approaches vary widely in their level of abstraction and evaluations specified. 
-  We propose a rough taxonomy to help contrast these approaches and begin to understand what types of design metrics can be measured to help designers of these games. Our taxonomy is not intended to be exhaustive or complete. Instead, it is inteded to serve as a guide to the development of better game design support tools and techniques. 
-  Also note that any given design project often pursues different design goals both over the life of the project and at any given point in development of a game.
-** BEHAVIORAL / BEHAVIORIST
-   Behavioral design goals focus on low-level details of player activity in a game.
-   Gamification [hamari?],  approaches design for real-world or work-related activity engagement and outcomes.
-   Competitive game designers often define a variety of metrics to describe how balanced the changes of two or more sides in a game are [REF: jaffee restricted play; elias].
-   Behavioral game design approaches can be characterized by an emphasis on what _actions_ a player takes in the game and what game-related _outcomes_ result.
-   Goal metrics generalize to optimizing a metric relating to how often players arrive in a particular outcome state. Example metrics include the number of players that complete a game (up to a point), the frequency of players joining or leaving a game, or the ratio of players winning when playing on the first or second turn.
-** COGNITIVE / EXPERIENTIAL
-   Experiential design goals emphasize the emotional and cognitive impact of games on players.
-   Fullerton et al. [REF] emphasize a high-level ``play-centric'' approach [explain!] targeting how players emotionally perceive a game.
-   Serious games [mcgonigal], and game-based learning [?] target player learning outcomes or engagement in real-world activities.
-   At a lower level, Swink [REF] describes a framework for understanding a game's ``feel''---the experience of using game controls for action in a game.
-   Experiential goal metrics optimize how players report their game experience.
-   Example metrics include player preferences for a given game level or set of controls, how well players learn a concept embedded in a game design (e.g. addition in a math game; economics in business simulation), or whether players feel emotionally moved by a game story. 
-   Note that unlike the behavioral metrics above, experiential metrics are not necessarily quanitifiable in terms of player behavior. Subjective player responses are instead a grounding source of information.
-** EXPRESSIVE / AUTHORIAL
-   Expressive design goals focus on how well a game structure satisfies the game designer's need to convey a message or explore an idea.
-   Anthropy has led a call for more mass participation in games as a means to explore new thematic content and investigate personal experiences [REF].
-   Bogost [REF: how to do] describes a host of purposes for games that emphasize the intent of an author, ranging from ``snapshot'' games capturing a moment in life to ``proceduralist'' games that employ rules to convey artistic meaning.
-   Expressive goal metrics target how well an intended system is represented through mechanics.
-   Behavioral and Experiential design goals focus on the activities and experience of game _players_. Expressive goals instead focus on the experience of a game _author_. 
-      Others emphasize 
-   play-centric - fullerton
-   gamification metrics - hamari?
-   expressive design - 
-   competitive design / balance - elias
-   control - swink
-   learning metrics - d cook
-   learning - mcgonigal
-** -- this needs to be at the end --
-   The goals above characterize a range of specific aspects of a game to design for. 
-   Shared across these approaches is an emphasis on particular game outcome states (demonstrated skill mastery, game duration, etc.). However, other parts of design are orthogonal to these metrics. For example, a notion of ``progression'' applies to many of these metrics---``flow'' over the course of the game, relative balance over time, or learning/mastery over time.
-
-   Traces of player activity are important for facets such as learning trajectories or balance over time.
-   The design taxonomy here helps compliment and extend earlier work in understanding approaches to modeling players [REF: smith et al] and efforts to define generic level design metrics [REF: liapis].
-   Many, if not all, of these design goals require further refinement to better understand the many levels 
-   --> issue: interactions among metrics
-   --> issue: non-markovian + vary over time
-   Note that many of these metrics have a great deal of nuance when considered over time. For example, a ``flow'' state is defined as a game that continually becomes more difficult to match player skill, yet many designs emphasize varying levels of perceived difficulty. Introducing a period of low difficulty followed by higher difficulty in order to give the player a sense of power and struggle introduces nuance to these models---
-** design optimization
-*** performance objective
-    example of Behavioral design objective
-    --
-    target: player rate of being hit
-    vary: bullet speed, size, fire rate
-    -> seek to achieve ``flow'' by fixed rate of success/failure
-*** subjective response
-    example of experiential design objective
-    --
-    target: player comparisons of whether controls were better
-    vary: thrust, drag
-    -> seek to get players to say ``better'' as often as possible (ideally reach point of no improvement)
-* game
-** why arcade?
-   many parameters that influence one another
-   wave-based play to test and vary
-   actions -> less planning / strategizing
-   scoring -> goals are explicit
 * active design optimization
   Working to reduce the playtesting burden and provide general approach to design optimization.
   Draw from active learning---techniques that try to guide the process of which design change to make next to optimize the design.
@@ -141,16 +74,22 @@
 ** ksvm
    [ditto - main point is KSVM doesn't have regression model that captures variance]
 ** ?neuroevol?
+* game
+** why arcade?
+   many parameters that influence one another
+   wave-based play to test and vary
+   actions -> less planning / strategizing
+   scoring -> goals are explicit
 * experiments
-** methods
-   (1) random collection of data
-   -- (a) simulation
-   -- (b) humans
-   (2) train model on collected data
-   two domains
-   (1) regression - vary bullet speed, size, firing rate to get player hit 6 times per wave
-   (2) preference - vary control thrust + drag to get player to rate as ``better'' over time
-** study 1 - regression - results
+* experiments
+  (1) random collection of data
+  -- (a) simulation
+  -- (b) humans
+  (2) train model on collected data
+  two domains
+  (1) regression - vary bullet speed, size, firing rate to get player hit 6 times per wave
+  (2) preference - vary control thrust + drag to get player to rate as ``better'' over time
+** simulation methods
 *** simulation description
     probabilistic model of skill response to parameters
     player: set of skills and single level of skill error
@@ -161,17 +100,6 @@
     --> models player as having 3 separate skills to handle different enemy parameters, but with fixed amount of ``slip-up''
     data pool:
     -- grid of evenly spaced points in parameter space for each bullet parameter
-*** simulation results
-    all 3 methods do quite well
-    EI asmpytotes to slightly better results
-*** human study results
-    UCB and EI are only ones to do well
-    -- UCB remains at consistently high performance
-    -- EI gradually gets worse over time
-    why?
-    -- variance and PI do not capture exploration and thus have difficulty finding good results
-    -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
-** study 2 - preference - results
 *** simulation description
     cf pref model paper
     player model: preferences for two parameters and shared error on preference (range of variability to tolerate)
@@ -189,6 +117,20 @@
     --> both worse or one worse + one nodiff
     (4) one better + one worse --> ``neither''
     captures same range of responses as in-game settings used for experiment
+** human study methods
+* results
+** regression
+*** simulation results
+    all 3 methods do quite well
+    EI asmpytotes to slightly better results
+*** human study results
+    UCB and EI are only ones to do well
+    -- UCB remains at consistently high performance
+    -- EI gradually gets worse over time
+    why?
+    -- variance and PI do not capture exploration and thus have difficulty finding good results
+    -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
+** classification
 *** simulation results
     GP random beats KSVM random -> GP is better able to model domain
     GP entropy shows best trend -> focus on finding out where problems are
