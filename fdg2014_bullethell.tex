@@ -36,7 +36,7 @@ Game designers often use human playtesting to gather feedback about game design 
 Playtesting, however, is expensive: human testers must be recruited, playtest results must be aggregated and interpreted, and changes to game designs must be extrapolated from these results.
 We argue that active learning techniques can be used to formalize and automate a subset of playtesting goals.
 Specifically, we focus on the low-level parameter tuning required to balance a game once the mechanics have been chosen.
-Through a case study on a shoot-'em-up game we demonstrate the efficacy of active learning to reduce the amount of playtesting needed to choose the optimal set of game parameters for a given (formal) design objective.
+Through a case study on a shoot-`em-up game we demonstrate the efficacy of active learning to reduce the amount of playtesting needed to choose the optimal set of game parameters for a given (formal) design objective.
 This work opens the potential for additional methods to reduce the human burden of performing playtesting for a variety of relevant design concerns.
 \end{abstract}
 
@@ -55,31 +55,32 @@ This work opens the potential for additional methods to reduce the human burden 
 
 
 % motivation
-Iterative game development practices emphasize the centrality of playtesting to improving and refining a game design.
-Human playtesters provide valuable feedback and playtesting is often claimed to be ``the single most important activity a designer engages in'' \cite{fullerton2008:playcentric}.
-Test data informs designs of how real players may react to the game in ways that self-testing, simulations, and design analysis may not.
+Iterative game design practices emphasize the centrality of playtesting to improve and refine a game's design.
+Human playtesters provide valuable feedback on audience reactions to a game.
+Playtesting is often claimed to be ``the single most important activity a designer engages in'' \cite{fullerton2008:playcentric}.
+Test data informs designers of how real players may react to the game in ways that self-testing, simulations, and design analysis may not.
 Playtesting, however, is expensive---developers must recruit players, devise design experiments, collect game play and subjective feedback data, and make design changes to meet design goals.
 
 %  other quotes:
 %``You might be thinking: But testing is an expensive process, isn't it?'' p.248
 
 % problem
-We ask the question: can we reduce the cost of the playtesting process and automate some of the more mundane aspects of playtesting?
+We ask the question: can we reduce the cost of the playtesting process by automating some of the more mundane aspects of playtesting?
 To address this problem we focus on a subset of playtesting questions focused on ``parameter tuning.''
 Parameter tuning involves making low-level changes to game mechanic settings such as character movement parameters, power-up item effects, or control sensitivity.
-Games based on careful timing and reflexes depend on well-tuned parameters, including racing, platforming, shoot-'em-up, and fighting game genres.
+Games based on careful timing and reflexes depend on well-tuned parameters, including racing, platforming, shoot-`em-up, and fighting game genres.
 Addressing the problem of parameter tuning requires a means to automatically select a set of potentially good parameter settings, test those settings with humans, evaluate the human results, and repeat the process until a pre-defined design goal is achieved.
 
 
 % contributions
-Our central insight is to model playtesting as a form of active learning \cite{settles2012:al-book}.
-Active learning involves selecting among a set of possible inputs to get the best output while minimizing the number of inputs tested.
+Our central insight is to model playtesting as a form of active learning.
+Active learning \cite{settles2012:al-book} involves selecting among a set of possible inputs to get the best output while minimizing the number of inputs tested.
 We define the ``best output'' in terms of a parameter tuning design goal and treat a setting for a game design as an ``input.''
-This paper makes XX contributions toward machine-driven playtesting:
+This paper makes three contributions toward machine-driven playtesting:
 \begin{enumerate}
-\item A formulation of efficient playtesting as an active learning problem
+\item Machine-driven playtesting---a formulation of efficient playtesting as an active learning problem % TODO: "active playtesting"? "machine-driven playtesting"? needs a better name
 \item A definition of a set of playtesting goals in terms of active learning metrics
-\item A case study of a shoot-'em-up game demonstrating the efficacy of active learning to reduce the number of playtests needed to optimize (1) difficulty-related and (2) control-related game parameters
+\item A case study of a shoot-`em-up game demonstrating the efficacy of active learning to reduce the number of playtests needed to optimize (1) difficulty-related and (2) control-related game parameters
 \end{enumerate}
 
 % differences from prior work
@@ -93,7 +94,7 @@ Our approach complements these tools for early-stage testing with late-stage ref
 % roadmap
 In the remainder of the paper we first compare our approach to related efforts at game design support.
 We next define a set of parameter tuning design goals and relate them to active learning approaches.
-Following this we describe a case study of automated playtesting using a shoot-'em-up game.
+Following this we describe a case study of automated playtesting using a shoot-`em-up game.
 After describing the game used we present results showing the efficacy of active learning to model a known simulated player model and human data collected from an online study.
 We conclude with a discussion of the limitations, applications, and potential extensions to this playtesting approach.
 
@@ -104,34 +105,12 @@ We conclude with a discussion of the limitations, applications, and potential ex
 \section{Related Work}
 
 % overview
-Two research areas are closely related to automated playtesting: online game adaptation and offline game design tools.
-Online game adaptation involves adjusting game elements in real time during play to meet given design goals.
-Example design goals are in-game performance (``dynamic difficulty adjustment'') and subjective preference ratings (``preference learning'').
+Two research areas are closely related to automated playtesting: offline game design tools and online game adaptation.
+Offline game design tools enable designers to explore possible game designs by defining a high-level space of games through a design language.
+Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
 Offline game design tools enable designers to explore possible game designs by defining a high-level space of games through a design language.
 Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
 
-\subsection{Online Game Adaptation}
-%% online adaptation: hand-crafted rules vs ML/EC
-% hand-crafted rules
-Online game adaptation researchers have used both hand-crafted rules and data-driven techniques.
-Hunicke and Chapman \cite{hunicke2004:dda} tracked the average and variance of player damage and inventory levels and employ a hand-crafted policy to adjust levels of enemies or powerups. 
-Systems by Magerko et al. \cite{magerko2006:isat}, El-Nasr \cite{seifel-nasr2007:mirage}, and Thue et al. \cite{thue2007:storytell-pm} model players as vectors of skills, personality traits, or pre-defined ``player types'' and select content to fit players using hand-crafted rules. % note: erring on side of more for now
-Hand-crafted rules enable designers to describe fine-tuned details of how to adjust a game toward design goals.
-However, designers must fully describe how to tune the game and rules are often sensitive to minor changes in game settings.
-
-% ML / EC
-To bypass the brittleness of rules others have employed data-driven techniques that optimize game parameters toward design goals.
-Hastings et al. \cite{hastings2009:gar}, Liapis et al. \cite{liapis2013:rank-based-interactive-evol} and Yu and Riedl \cite{yu2013:storyeti} model player preferences using neuro-evolutionary or machine learning techniques, respectively, and optimize the output of these models to select potential game parameters.
-Harrison and Roberts \cite{harrison2013:scrabble-retention} optimize player retention and Zook and Riedl \cite{zook2012:tf} optimize game difficulty using similar techniques.
-
-%Both rule-based and data-driven online adaptation approaches target real-time adjustments of a game to known design goals.
-Automated playtesting extends these approaches by providing principled methods for guiding the process of designing hand-crafted rules or optimizing game parameters.
-When hand-crafting rules, automated playtesting informs the choice of which rule parameters to use.
-When optimizing models learned from data, automated playtesting informs the choice of which next set of parameters to test during the optimization process.
-We argue that research to date has ignored the problem of reducing ``sample complexity''---the number of data points (human tests) needed to train a model.
-Active learning makes explicit the tradeoff in playtesting between ``exploring'' potentially valuable game design settings and ``exploiting'' known good solutions with small changes.
-%Active learning complements the above approaches by providing a principled method for reducing the number of playtests needed without changing the fundamental models involved.
-Thus, active learning complement online game adaptation through reducing the number of mediocre or bad sets of game parameters players experience before arriving at good parameter settings without changing the underlying models used.
 
 
 \subsection{Offline Game Design Tools}
@@ -150,8 +129,44 @@ Active learning can enhance simulation approaches by guiding the sampling proces
 Model-checking approaches provide guarantees on generated designs having formally defined properties---typically at the cost of being limited to more coarse design parameter decisions.
 Smith et al. \cite{smith2013:quantify-play}, Butler et al. \cite{butler2013:progression-tool}, and Horswill and Foged \cite{horswill2012:levelgen} employ logic programming and constraint solving to generating levels or sets of levels meeting given design constraints.
 Jaffe et al. \cite{jaffe2012:balance} employ game-theoretic analysis to understand the trade-offs of game design parameters for balance in a competitive game.
+
+% differences of playtest vs model-check -> value to designers
 Our approach to automated playtesting is intended to complement these approaches to high-level early design exploration with low-level optimization of game parameters and tuning.
 Further, we focus on a generic technique that applies to cases with human testers in the loop, crucial to tuning game controls or subjective features of games.
+%
+Offline design tools currently enable designers to formally define and enforce properties of a game design across all possible player behaviors in a specific game or space of designs.
+To date these tools have emphasized techniques for ensuring game designs have desired formal properties that meet designer intent.
+%
+% note: not about model-checking vs playtesting but expanding offline tools available
+Machine-driven playtesting enables players to provide feedback to designers on \textit{expected} player behaviors in a game.
+Developing machine-driven playtesting techniques affords designers insight into how human audiences interact with designer intent, complementing an understanding of whether and how a game matches formal criteria.
+
+
+
+
+\subsection{Online Game Adaptation}
+%% online adaptation: hand-crafted rules vs ML/EC
+% hand-crafted rules
+Online game adaptation researchers have used both hand-crafted rules and data-driven techniques.
+Hunicke and Chapman \cite{hunicke2004:dda} tracked the average and variance of player damage and inventory levels and employ a hand-crafted policy to adjust levels of enemies or powerups. 
+Systems by Magerko et al. \cite{magerko2006:isat}, El-Nasr \cite{seifel-nasr2007:mirage}, and Thue et al. \cite{thue2007:storytell-pm} model players as vectors of skills, personality traits, or pre-defined ``player types'' and select content to fit players using hand-crafted rules. % note: erring on side of more for now
+Hand-crafted rules enable designers to describe fine-tuned details of how to adjust a game toward design goals.
+However, designers must fully describe how to tune the game and rules are often sensitive to minor changes in game settings.
+
+% ML / EC
+To bypass the brittleness of rules others have employed data-driven techniques that optimize game parameters toward design goals.
+Hastings et al. \cite{hastings2009:gar}, Shaker et al. \cite{shaker2013:crowdsource-platform-aesthetics}, Liapis et al. \cite{liapis2013:rank-based-interactive-evol} and Yu and Riedl \cite{yu2013:storyeti} model player preferences using neuro-evolutionary or machine learning techniques and optimize the output of these models to select potential game parameters.
+Harrison and Roberts \cite{harrison2013:scrabble-retention} optimize player retention and Zook and Riedl \cite{zook2012:tf} optimize game difficulty using similar techniques.
+
+%Both rule-based and data-driven online adaptation approaches target real-time adjustments of a game to known design goals.
+Automated playtesting extends these approaches by providing principled methods for guiding the process of designing hand-crafted rules or optimizing game parameters.
+When hand-crafting rules, automated playtesting informs the choice of which rule parameters to use.
+When optimizing models learned from data, automated playtesting informs the choice of which next set of parameters to test during the optimization process.
+We argue that research to date has ignored the problem of reducing ``sample complexity''---the number of data points (human tests) needed to train a model.
+Active learning makes explicit the trade-off in playtesting between ``exploring'' potentially valuable game design settings and ``exploiting'' known good solutions with small changes.
+%Active learning complements the above approaches by providing a principled method for reducing the number of playtests needed without changing the fundamental models involved.
+Thus, active learning complement online game adaptation through reducing the number of mediocre or bad sets of game parameters players experience before arriving at good parameter settings without changing the underlying models used.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,21 +175,28 @@ Further, we focus on a generic technique that applies to cases with human tester
 
 Our goal is to reduce the playtesting burden by efficiently choosing game designs to test on players.
 Active learning (AL) provides a generic set of techniques to guide the playtesting process of choosing a set of design parameters to test toward achieving a design goal.
-Playtesting typically involves tradeoffs between testing designs that are poorly understood (exploration) and refining designs that are known to be good but need minor changes (exploitation).
-Active learning captures this intuition through explicit models of the exploration-exploitation tradeoff.
+Playtesting typically involves trade-offs between testing designs that are poorly understood (exploration) and refining designs that are known to be good but need minor changes (exploitation).
+Active learning captures this intuition through explicit models of the exploration-exploitation trade-off.
 In the following sections we will define active learning in the playtesting context and provide the intuition behind several common active learning methods.
 Our aim is to characterize playtesting in terms of active learning; full mathematical treatments are available through the references.
 
 
 \subsection{Playtesting as Active Learning}
-Active learning techniques take a model of how a design works and choose how to change that design to achieve a design goal.
+Machine-driven playtesting---AL for game design---uses a model of how a design works to choose how to change that design to achieve a design goal.
 Formally, the design goal is known as the \textit{objective function} and captures the relationship between input (game design parameters) and desired output (game design goals).
-An \textit{acquisition function} takes information from the objective function and uses it to decide on the next set of inputs to test.
-Objective functions come in two forms: (1) regression and (2) classification models.
-\textit{Regression} models capture continuous outputs---e.g. how the rate of enemy firing in a shoot-'em-up influences the number of times a player is hit or how the height of jumps in a platformer influences how long it takes players to complete a level.
+An \textit{acquisition function} takes information on expected outputs from the objective function and uses it to decide on the next set of inputs to test.
+
+Objective functions come in two forms: regression and classification models.
+\textit{Regression} models capture continuous outputs---e.g. how the rate of enemy firing in a shoot-`em-up influences the number of times a player is hit or how the height of jumps in a platformer influences how long it takes players to complete a level.
 \textit{Classification} models capture discrete outputs---e.g. whether a player preferred the current control sensitivity compared to the previous set of controls in a racing game or which choice a player made in a choose-your-own adventure.
-Acquisition functions differ for these two tasks and we will treat each in turn.
-Note that at this high level formulation a wide variety of design goals can be formulated as goals for playtesting---the primary challenge lies in defining a useful metric for measuring these goals through player feedback or in-game behavior.
+Note that many design goals can be formulated as goals for playtesting: the primary challenge lies in defining a useful metric for measuring these goals through player feedback or in-game behavior.
+
+
+Acquisition functions differ for regression and classification functions.
+In the next sections we provide intuitive definitions of several acquisition functions---references to the relevant mathematical literature are provided.
+Our survey of regression methods covers key methods that balance between exploration of possible designs and exploitation to refine high quality designs.
+For classification methods we cover the two most common frameworks for AL with discrete data that are intended to mitigate the impact of highly variable data.
+
 
 
 \subsection{Regression Models}
@@ -239,14 +261,18 @@ Two varieties of QBB are relevant: QBB vote and QBB probability.
 In \textit{QBB vote} each objective function model votes on outcomes, giving a single choice.
 When only two options are possible (e.g. controls were better or worse) the design with the greatest disagreement between two binary outcomes is chosen.
 %% TODO: verify me with actual tests!
-When multiple options are possible (e.g. a multiway branch in a choose-your-own-adventure), the design with the greatest difference between the top two options is chosen.
+When multiple options are possible (e.g. a multi-way branch in a choose-your-own-adventure), the design with the greatest difference between the top two options is chosen.
 %
 In \textit{QBB probability} each objective function model estimates how probable each outcome is, giving a weight to all choices.
-The weights of all models are averaged and the point with lowest probability is chosen. \mytodo{find citation}\todo[inline]{find citation}
+The weights of all models are averaged and the point with lowest probability is chosen. \todo[inline]{find citation}
 
 % TODO: KL-divergence or vote entropy?
 
 % TODO: decision boundary distance for KSVM?
+
+% TODO: more of uncertainty sampling?
+
+% TODO: error reduction methods?
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -262,8 +288,8 @@ The weights of all models are averaged and the point with lowest probability is 
 \label{fig:shmup}
 \end{figure}
 
-We developed a simple shoot-'em-up game to do a case study of active learning for playtesting.
-Shoot-'em-up games emphasize reflexes and pattern recognition abilities as a player maneuvers a ship to dodge enemy shots and return fire.
+In order to conduct a case study of machine-driven playtesting we developed a simple shoot-`em-up game (Figure \ref{fig:shmup}).
+Shoot-`em-up games emphasize reflexes and pattern recognition abilities as a player maneuvers a ship to dodge enemy shots and return fire.
 %
 In general, arcade games serve as an ideal starting domain for low-level parameter tuning:
 \begin{itemize}
@@ -273,24 +299,26 @@ In general, arcade games serve as an ideal starting domain for low-level paramet
 \item A scoring system makes gameplay goals and progress clear, unlike domains involving puzzle-solving or aesthetic enjoyment of a game world or setting.
 \end{itemize}
 %
-In the case of shoot-`em-up games, we tested two different kinds of game design goals: player game play behavior goals---e.g. player success rates or score achieved---and subjective responses goals---e.g. getting good user ratings on the feel of the controls.
-To test active learning for regression we set a design goal of the player being hit exactly six times during each wave of enemies and tuned enemy parameters.
-To test active learning for classification we set a design goal of the player evaluating a set of controls as better than the previous set and tuned player control parameters.
+In the case of shoot-`em-up games, we tested two different kinds of game design goals: player game play behavior goals and player subjective response goals.
+Player game play behavior goals cover cases where designers seek particular play patterns or outcomes---e.g. player success rates or score achieved. 
+Subjective responses goals cover cases where designers desire specific player subjective feedback---e.g. getting good user ratings on the feel of the controls.
+
 
 % % enemy params
-We implemented a shoot-`em-up arcade game based on space ship combat, shown in Figure~\ref{fig:shmup}.
+The shoot-`em-up game is based on space ship combat over a series of waves.
 During each wave a series of enemies appear that fire bullets at the player. 
-For enemy tuning we varied the: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
+To test active learning for regression we set a game play behavior design goal of the player being hit exactly six times during each wave of enemies and tuned enemy parameters.
+We varied the: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
 Increasing bullet size requires the player to move more carefully to avoid bullets. 
 Faster bullets require quicker player reflexes to dodge incoming fire. 
 More rapid firing rates increase the volume of incoming fire. 
 Together these three parameters govern how much players must move to dodge enemy attacks, in turn challenging player reflexes. 
 Getting approximate settings for these parameters is easy, but fine-tuning them for a desired level of difficulty can be challenging. 
 
+
 % % control params
-For control tuning we varied two
-%Player controls are limited to shooting at enemies and moving the ship. 
-ship movement parameters: drag and thrust. 
+To test active learning for classification we set a subjective response design goal of the player evaluating a set of controls as better than the previous set and tuned player control parameters.
+We varied two ship movement parameters: drag and thrust. 
 Drag is the ``friction'' applied to a ship that decelerates the moving ship at a constant rate when it is moving---larger values cause the ship to stop drifting in motion sooner. 
 Thrust is the ``force'' a player movement press applies to accelerate the ship---larger values cause the ship to move more rapidly when the player presses a key to move. 
 %
@@ -301,9 +329,6 @@ We provided a fourth option of ``no different'' for when players could not disti
 
 
 %Our experiments investigate how well an AI system can learn the right parameter settings to achieve a desired level of player performance (in terms of rate of being hit by enemies) or a most preferred set of controls (in terms of player subjective responses).
-
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -322,7 +347,7 @@ All three of these objective functions can be trained in regression or classific
 
 % enemy tuning summary
 Our results show active learning can reduce the number of human playtests needed.
-For enemy paramter tuning (a regression problem) we find variance, UCB, and EI are all effective in simulation, but only UCB and EI are effective on human data.
+For enemy parameter tuning (a regression problem) we find variance, UCB, and EI are all effective in simulation, but only UCB and EI are effective on human data.
 This is likely due to human players having more variability in playing behavior than our simulated models.
 
 % control tuning results summary
@@ -364,7 +389,7 @@ Differences below the player error threshold yield a ``no difference'' result; p
 Second, the individual parameter responses are combined into the final model response.
 If both responses are the same then that response is given.
 If one response is ``no difference'' then the other response is given.
-Otherwise the model resonds with ``neither.''
+Otherwise the model responds with ``neither.''
 When training simulated models we generated a fixed ideal playtester as before and varied sets of controls using a 5 x 5 x 5 x 5 grid.
 Each test point consisted of both current and previous wave control parameters.
 
