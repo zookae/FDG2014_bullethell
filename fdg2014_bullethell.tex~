@@ -14,7 +14,7 @@
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
-\title{Automatic Game Parameter Tuning and Playtesting via Active Learning}
+\title{Automatic Playtesting for Game Parameter Tuning via Active Learning}
 
 
 \numberofauthors{1} 
@@ -370,6 +370,9 @@ Each test point consisted of both current and previous wave control parameters.
 
 % experiment design
 Using these simulation models we performed 10-fold cross-validated experiments to measure how accurately an objective function could predict playtester output given a set of design parameters.
+Every objective function was trained to use only the three enemy parameters to predict the squared difference between the number of times the player was hit and the desired rate of 6 times.
+We square the difference to penalize sets of parameters that differ from the ideal more strongly as they become further from the desired outcome.
+
 In each cross-validation fold we generated a set of 30 initial randomly sampled design parameter settings and used the simulated models to generate playtester responses.
 These settings and responses formed the initial training data set.
 An additional set of 100 testing points was generated in the same way.
@@ -412,6 +415,9 @@ We retained only preference responses during the first 10 waves of play to avoid
 %% if binary min 10 waves -> 41 players, 296 points
 
 Our active learning evaluation used this dataset with the same process as described for the simulation approaches above.
+We trained each objective function to predict preference responses using only the control settings for the most recent wave and the control settings for the previous wave.
+Note that we did not collect preference comparisons after the first wave of the game as players could not yet compare control settings.
+
 For each cross-validation split we constructed a test set of data by randomly selecting a subset of points.
 After this we then randomly sampled to choose the seed data set from only data remaining after removing the test set.
 The training pool was the data points remaining after removing the seed data points.
@@ -441,7 +447,7 @@ Both methods explicitly balance between exploring and exploiting designs, sugges
 \begin{figure}[tbph]
 \centering
 \includegraphics[width=\linewidth]{regression_simulation}
-\caption{regression simulation; mse; down is good}
+\caption{Regression simulation mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
 \label{fig:reg_sim}
 \end{figure}
 %    all 3 methods do quite well
@@ -459,7 +465,7 @@ More playtests marginally improved AL performance.
 \begin{figure}[tbph]
 \centering
 \includegraphics[width=\linewidth]{regression_experiment}
-\caption{regression experiment; mse; down is good}
+\caption{Regression human study mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
 \label{fig:reg_expr}
 \end{figure}
     % UCB and EI are only ones to do well
@@ -485,7 +491,6 @@ These results make a strong case for AL applied to optimizing low-level in-game 
 
 
 \subsection{Classification}
-
 Our classification experiments show AL can be effective but is more challenging in subjective domains.
 In simulation data AL methods---particularly entropy sampling---show significant improvements over random sampling.
 % TODO : rerun w/new data subset to check if still bad
@@ -499,7 +504,7 @@ These results suggest AL works for preference learning when the domain can be mo
 \begin{figure}[tbph]
 \centering
 \includegraphics[width=\linewidth]{classification_simulation}
-\caption{classification simulation; f1; up is good}
+\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
 \label{fig:cls_sim}
 \end{figure}
     % GP random beats KSVM random -> GP is better able to model domain
@@ -507,39 +512,48 @@ These results suggest AL works for preference learning when the domain can be mo
     % QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
     % NE most effective; esp QBB vote
     % NE random outdoes others
-In simulation QBB vote and entropy sampling showed strong performance gains across all three objective functions.
+In simulation QBB vote and entropy sampling showed strong performance gains across all three objective functions (Figure \ref{fig:cls_sim}).
 Previous work has found QBB models are best for high variance data sets \cite{schein2007:al-logreg-eval}.
 Entropy sampling is also effective for high-variance situations.
 The complexity of our simulation model made it a highly variable function to optimize and demonstrates the value of AL methods that can handle these situations.
-
-
 
 
 % human
 \begin{figure}[tbph]
 \centering
 \includegraphics[width=\linewidth]{classification_experiment}
-\caption{classification experiment; f1; up is good}
+\caption{Classification human study F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
 \label{fig:cls_expr}
 \end{figure}
-    GP random beats KSVM random -> GP is better able to model domain
-    no strong winners, domain was very hard
-    KSVM entropy is slightly better 
-    QBB models don't perform 
-    --> QBB + KSVM results suggest consistent domain but complex underlying model
+    % all methods roughly equal
+    % GP random does well
+    % GP random beats KSVM random -> GP is better able to model domain
+    % no strong winners, domain was very hard
+    % KSVM entropy is slightly better 
+    % QBB models don't perform 
+    % --> QBB + KSVM results suggest consistent domain but complex underlying model
+    % only minor gains: ~160 samples to improve, little growth over random
+In human studies only very specific acquisition and objective function combinations were able to show substantial improvements (Figure \ref{fig:cls_expr}).
+Neural network optimization (NE) was unable to improve over random sampling.
+These results are surprising given the efficacy of neural nets for preference learning in other contexts and merit additional investigations. % my hunch: fewer features makes it harder
+
+Gaussian Processes showed initially strong learning (by 60 samples using QBB probability or vote), but random sampling reached competitive performance with more (160) samples.
+Kernel SVMs showed the opposite trend: entropy showed strong performance only after reaching many samples (200).
+Overall these results suggest that GPs are able to effective learn when few samples are available by using QBB acquisition functions to mitigate variance.
+With a larger pool of samples KSVMs eventually become more effective, though GPs appear to converge to similar performance.
+
+% summary
+Our classification experiments demonstrate AL can reduce the amount of playtesting needed even for subjective features of a design such as control settings.
+Reducing playtest costs, however, requires acquisition functions that mitigate the high variance inherent in subjective response data.
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Discussion}
-% % recap
-% modeling design space --> can visualize or be used by designers
-% tailoring --> online adjustment of games to players
-% formalization --> support more understanding of AI in design process, rather than just produce assets; link player modeling with procedural content
-
-% % vision: game design cognitive architecture, capturing _process of game design, not just reproducing _product
-
-% % value for optimizing subjective or objective results
+\section{Conclusions}
 
 % % note: can combine multiple aspects into single acquisition function, but then need additional complexity of learning how to balance objectives if not told directly; e.g. preference + performance
 
@@ -558,6 +572,6 @@ The complexity of our simulation model made it a highly variable function to opt
 
 
 \bibliographystyle{abbrv}
-\bibliography{../latex/lib}  % sigproc.bib is the name of the Bibliography in this case
+\bibliography{../latex/lib}  % keeping lib in separate github project
 
 \end{document}

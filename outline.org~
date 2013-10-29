@@ -81,7 +81,6 @@
    actions -> less planning / strategizing
    scoring -> goals are explicit
 * experiments
-* experiments
   (1) random collection of data
   -- (a) simulation
   -- (b) humans
@@ -135,12 +134,17 @@
     GP random beats KSVM random -> GP is better able to model domain
     GP entropy shows best trend -> focus on finding out where problems are
     QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
+    NE most effective; esp QBB vote
+    NE random outdoes others
 *** human study results
+    all methods roughly equal
+    GP random does well
     GP random beats KSVM random -> GP is better able to model domain
     no strong winners, domain was very hard
     KSVM entropy is slightly better 
     QBB models don't perform 
     --> QBB + KSVM results suggest consistent domain but complex underlying model
+    only minor gains: ~160 samples to improve, little growth over random
 * discussion
 ** AI for low-level design
 ** applications
