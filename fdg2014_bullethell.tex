@@ -560,18 +560,25 @@ The complexity of our simulation model made it a highly variable function to opt
     % QBB models don't perform 
     % --> QBB + KSVM results suggest consistent domain but complex underlying model
     % only minor gains: ~160 samples to improve, little growth over random
-In human studies only very specific acquisition and objective function combinations were able to show substantial improvements (Figure \ref{fig:cls_expr}).
-Neural network optimization (NE) was unable to improve over random sampling.
-These results are surprising given the efficacy of neural nets for preference learning in other contexts and merit additional investigations. % my hunch: fewer features makes it harder
+In human studies only specific acquisition and objective function combinations achieved substantial improvements over random sampling (Figure \ref{fig:cls_expr}).
+%Neural network optimization (NE) was only improved when using entropy-based sampling.
+%These results are surprising given the efficacy of neural nets for preference learning in other contexts and merit additional investigations. % my hunch: fewer features makes it harder
+%
+Gaussian Processes showed strong early (by 80/300 maximum samples) learning with entropy-based sampling.
+All other GP sampling strategies (including random) reached competitive performance with more (160) samples.
+Kernel SVMs showed a trend of steady improvement across all methods.
+Entropy alone showed weaker performance---at the level of random sampling---and only with large sample sizes.
+Neural network optimization failed to improve with non-random sampling strategies.
 
-Gaussian Processes showed initially strong learning (by 60 samples using QBB probability or vote), but random sampling reached competitive performance with more (160) samples.
-Kernel SVMs showed the opposite trend: entropy showed strong performance only after reaching many samples (200).
-Overall these results suggest that GPs are able to effective learn when few samples are available by using QBB acquisition functions to mitigate variance.
-With a larger pool of samples KSVMs eventually become more effective, though GPs appear to converge to similar performance.
-
+Across methods GPs with entropy-based sampling showed the strongest performance with few samples while KSVMs with decision-boundary sampling was strongest with more samples.
+Together these results suggest GPs are excel with few samples by rapidly exploring potentially valuable options.
+Gaussian Processes also showed the best baseline performance with random sampling, meaning they effectively model the problem domain at hand and likely contributing to their strong performance with fewer samples.
+With more samples KSVMs become more effective---in general Bayesian methods (e.g. GPs) tend to show strong performance with little data before converging to similar results as non-Bayesian approaches (e.g. KSVMs).
+That GPs showed somewhat worse performance with large sample sizes (0.76 vs 0.80 F1 scores) merits further investigation but may be partially due to the small number of total samples employed.
+%
 % summary
 Our classification experiments demonstrate AL can reduce the amount of playtesting needed even for subjective features of a design such as control settings.
-Reducing playtest costs, however, requires acquisition functions that mitigate the high variance inherent in subjective response data.
+Reducing playtest costs, however, requires acquisition functions (e.g. entropy sampling or query by bagging) that mitigate the high variance inherent in subjective response data.
 
 
 
