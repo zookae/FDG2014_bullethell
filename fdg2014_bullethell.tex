@@ -188,14 +188,13 @@ An \textit{acquisition function} takes information on expected outputs from the 
 
 Objective functions come in two forms: regression and classification models.
 \textit{Regression} models capture continuous outputs---e.g. how the rate of enemy firing in a shoot-`em-up influences the number of times a player is hit or how the height of jumps in a platformer influences how long it takes players to complete a level.
-\textit{Classification} models capture discrete outputs---e.g. whether a player preferred the current control sensitivity compared to the previous set of controls in a racing game or which choice a player made in a choose-your-own adventure.
+\textit{Classification} models capture discrete outputs---e.g. which of a pair of control settings a player preferred in a racing game or which choice a player made when given a set of options in a choose-your-own adventure.
 Note that many design goals can be formulated as goals for playtesting: the primary challenge lies in defining a useful metric for measuring these goals through player feedback or in-game behavior.
-
 
 Acquisition functions differ for regression and classification functions.
 In the next sections we provide intuitive definitions of several acquisition functions---references to the relevant mathematical literature are provided.
-Our survey of regression methods covers key methods that balance between exploration of possible designs and exploitation to refine high quality designs.
-For classification methods we cover the two most common frameworks for AL with discrete data that are intended to mitigate the impact of highly variable data.
+Our survey of regression models covers key methods that balance between exploration of possible designs and exploitation to refine high quality designs.
+For classification models we cover the most common frameworks for AL with discrete data that are intended to mitigate the impact of highly variable data.
 
 
 
@@ -232,12 +231,14 @@ Intuitively, this capture the notion of initially exploring a variety of possibl
 
 \subsection{Classification Models}
 %% classification
-We consider three acquisition functions for classification models: (1) entropy, (2) query-by-bagging voting, and (3) query-by-bagging probability.
+We consider five acquisition functions for classification models: (1) entropy, (2) query-by-bagging voting, (3) query-by-bagging probability, (4) expected error reduction, and (5) variance reduction.
 % entropy
 % note: technically a subset of uncertainty sampling
 % (1) least confident
 % (2) margin-based
 % (3) entropy
+% (4) expected error reduction
+% (5) variance reduction
 \textit{Entropy} acquisition functions choose designs that are most uncertain according to entropy \cite{settles2012:al-book}.
 Entropy measures the amount of information needed to encode a distribution.
 Intuitively, this captures how uncertain a model is about the possible (discrete) outcomes.
@@ -249,7 +250,7 @@ Entropy sampling acts similarly to variance-based sampling for regression.
 % (1) QBC
 % (2) QBB
 \textit{Query-By-Bagging} (QBB) approaches emphasize disagreement among potential models \cite{settles2012:al-book}.
-First, multiple copies of the same objective function are trained using random selections of the playtest data gathered so far.
+First, multiple copies of the same objective function model are trained using random selections of the playtest data gathered so far.
 This captures the notion of guessing how the model might be if slightly different sets of playtests had occurred.
 Second, these models predict the outcome of new playtests.
 The final choice of design to test is the one these models most disagree on.
@@ -259,12 +260,21 @@ Intuitively, this captures the idea of picking designs that are most likely to b
 % QBB probability
 Two varieties of QBB are relevant: QBB vote and QBB probability.
 In \textit{QBB vote} each objective function model votes on outcomes, giving a single choice.
-When only two options are possible (e.g. controls were better or worse) the design with the greatest disagreement between two binary outcomes is chosen.
-%% TODO: verify me with actual tests!
+When only two options are possible (e.g. new controls were better or worse than previous) the design with the greatest disagreement between two binary outcomes is chosen.
 When multiple options are possible (e.g. a multi-way branch in a choose-your-own-adventure), the design with the greatest difference between the top two options is chosen.
 %
 In \textit{QBB probability} each objective function model estimates how probable each outcome is, giving a weight to all choices.
 The weights of all models are averaged and the point with lowest probability is chosen. \todo[inline]{find citation}
+
+% expected error reduction
+% variance reduction
+Expected error reduction and variance reduction attempt to maximize the quality of objective function predictions, rather than reduce variance or disagreement \cite{settles2012:al-book}.
+In \textit{expected error reduction} an unlabeled data point is selected and assigned one of the possible labels.
+This fake data point is used to train a new objective function model and the error of that model is calculated over all remaining unlabeled data points.
+Expected error reduction then picks the data point that results in a model with the least average (``expected'') error when considering all possible label assignments.
+Intuitively, expected error reduction is guessing how a new playtest could result and picking the playtest that will most improve the model of how people play.
+\textit{Variance reduction} performs a similar process but minimizes the variance of predictions over data points, rather than the error.
+Intuitively, a the model is picking a playtest most likely to increase certainty about how future playtests will go.
 
 % TODO: KL-divergence or vote entropy?
 
@@ -413,9 +423,35 @@ Within each fold we then repeated the following process:
 \item Generate a player response for that training pool point and remove it from the training pool.
 \item Return to the first step and repeat the process.
 \end{enumerate}
-\noindent For regression we measured error as \todo[inline]{check} the mean squared error from the desired rate of being hit.
+\noindent For regression we measured error as the mean squared error from the desired rate of being hit.
 For classification we measured error as the F1 score---a combination of model accuracy and coverage of sample data.
 
+
+% % GP classification
+% % entropy for sim; QBB prob for real (prob same)
+% sim: best early classifier (0.78 @ 80 samples), same as KSVM w/more (0.85 @ 280)
+% real: drop in performance to tied worst late classifier (0.78 @ 280); best early (0.74 @ 80)
+%
+% % GP regression
+% % GP UCB for sim; GP UCB for real
+% sim: 
+% real: GP UCB best (200 @ 80; 225 @ 280) 
+%	note: random beats neuro random, ksvm random badly (260 @ 80 vs 510 vs 633; 240 @ 280 vs 500 vs 685)
+
+% % KSVM classification
+% % QBB vote for sim; QBB prob for real (prob same)
+% sim: worst classifier (0.83 @ 280)
+% real: best late classifier (0.81 @ 280)
+%
+% % KSVM regression
+% 
+
+% % NE classification
+% % QBB vote for sim; QBB vote for real (prob much worse, but doesn't make sense)
+% best classifier 0.96 @ 200
+% real: worst classifier (0.71 @ 80; 0.76 @ 280)
+%
+% % NE regression
 
 \subsection{Human Study Methods}
 
@@ -525,6 +561,13 @@ In simulation data AL methods---particularly entropy sampling---show significant
 % may want to hack on classifiers more or try other feature sets
 Human data did not show strong improvements for AL methods and only marginal performance improvements for random sampling.
 These results suggest AL works for preference learning when the domain can be modeled as a preference choice, but that our human data was not of this sort.
+
+\begin{figure}[tbph]
+\centering
+\includegraphics[width=\linewidth]{classification_results}
+\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
+\label{fig:cls_all}
+\end{figure}
 
 
 % simulation
