@@ -4,6 +4,8 @@
 \usepackage{hyperref}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{tabularx}
 \newcommand{\mytodo}[1]{\textbf{[[#1]]}}
 
 \begin{document}
@@ -344,7 +346,7 @@ We provided a fourth option of ``no different'' for when players could not disti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Experiments}
-Our experiments sought to test whether the active learning framework could reduce the number of human playtesters needed to tune design parameters compared to a random sampling approach.
+Our experiments sought to test whether the active learning framework could reduce the number of human playtests needed to tune design parameters compared to a random sampling approach.
 Random sampling is the standard method used to evaluate the efficacy of AL models for improving model fits for a fixed number of playtests \cite{settles2012:al-book}. This is similar to A/B testing approaches that capture large amounts of data before acting on the results.
 
 In two experiments we used the active learning acquisition functions given above for tuning enemy parameters or tuning player controls.
@@ -354,21 +356,48 @@ The simulation experiments allowed us to verify that our methods would work in p
 In each study we employed three different objective functions---Gaussian Processes (GP), kernel support vector machines (KSVM), and optimized neural networks (``neuro-evolution'', NE).
 We chose these objective functions as they cover several player modeling approaches used in this domain: GPs are a common model in active learning contexts \cite{brochu2010:thesis}, kernel methods (particularly KSVMs) are a popular machine learning technique previously used in player modeling \cite{yu2011:minboredom}, and optimized neural networks have been widely used in preference learning \cite{yannakakis2011:edpcg}.\footnote{For computational reasons we employ a simple gradient-based optimization method, rather than the more common neuro-evolutionary approaches. We did not find any performance differences between the two optimization approaches in initial tests in our domain.}
 All three of these objective functions can be trained in regression or classification modes.
+KSVMs do not have probabilistic predictions in regression mode and NE do not produce probabilistic predictions, limiting the acquisition functions they are paired with.
 
 % enemy tuning summary
 Our results show active learning can reduce the number of human playtests needed.
-For enemy parameter tuning (a regression problem) we find variance, UCB, and EI are all effective in simulation, but only UCB and EI are effective on human data.
-This is likely due to human players having more variability in playing behavior than our simulated models.
+For enemy parameter tuning (a regression problem) we find GPs with UCB or EI have the best performance in both simulation and on human data.
+Variance performs well in simulation but poorly with humans; likely due to human players having more variability in playing behavior than our simulated models.
 
 % control tuning results summary
 For control tuning (a classification problem) we find QBB vote and entropy have competitive performance in simulation.
-On human data GPs show improved performance using QBB probability with few samples while KSVMs show improved performance using entropy with greater samples; NE showed little difference among techniques used.
-Our control tuning results suggest a generic set of controls all players agree is good is difficult to obtain.
+On human data GPs show good performance using QBB probability with few (roughly 80) samples while KSVMs show good performance using QBB probability with more (roughly 280) samples; NE showed the best performance overall and little difference among techniques used.
+Our control tuning results show a generic set of controls all players agree on as good is difficult to obtain.
 Combined across experiments, these results show active learning has promise for helping to automate low-level parameter tuning.
 
 In the following sections we detail our experimental design for both the simulated players and human participants.
 We then discuss the results of our tests in detail.
 
+
+% % GP classification
+% % entropy for sim; QBB prob for real (prob same)
+% sim: best early classifier (0.78 @ 80 samples), same as KSVM w/more (0.85 @ 280)
+% real: drop in performance to tied worst late classifier (0.78 @ 280); best early (0.74 @ 80)
+%
+% % GP regression
+% % GP UCB for sim; GP UCB for real
+% sim: 
+% real: GP UCB best (200 @ 80; 225 @ 280) 
+%	note: random beats neuro random, ksvm random badly (260 @ 80 vs 510 vs 633; 240 @ 280 vs 500 vs 685)
+
+% % KSVM classification
+% % QBB vote for sim; QBB prob for real (prob same)
+% sim: worst classifier (0.83 @ 280)
+% real: best late classifier (0.81 @ 280)
+%
+% % KSVM regression
+% 
+
+% % NE classification
+% % QBB vote for sim; QBB vote for real (prob much worse, but doesn't make sense)
+% best classifier 0.96 @ 200
+% real: worst classifier (0.71 @ 80; 0.76 @ 280)
+%
+% % NE regression
 
 \subsection{Simulation Methods}
 We devised two simple models of how players might respond to different design paramters to verify our active learning approach on ground truth information.
@@ -427,31 +456,6 @@ Within each fold we then repeated the following process:
 For classification we measured error as the F1 score---a combination of model accuracy and coverage of sample data.
 
 
-% % GP classification
-% % entropy for sim; QBB prob for real (prob same)
-% sim: best early classifier (0.78 @ 80 samples), same as KSVM w/more (0.85 @ 280)
-% real: drop in performance to tied worst late classifier (0.78 @ 280); best early (0.74 @ 80)
-%
-% % GP regression
-% % GP UCB for sim; GP UCB for real
-% sim: 
-% real: GP UCB best (200 @ 80; 225 @ 280) 
-%	note: random beats neuro random, ksvm random badly (260 @ 80 vs 510 vs 633; 240 @ 280 vs 500 vs 685)
-
-% % KSVM classification
-% % QBB vote for sim; QBB prob for real (prob same)
-% sim: worst classifier (0.83 @ 280)
-% real: best late classifier (0.81 @ 280)
-%
-% % KSVM regression
-% 
-
-% % NE classification
-% % QBB vote for sim; QBB vote for real (prob much worse, but doesn't make sense)
-% best classifier 0.96 @ 200
-% real: worst classifier (0.71 @ 80; 0.76 @ 280)
-%
-% % NE regression
 
 \subsection{Human Study Methods}
 
@@ -492,7 +496,7 @@ The training pool was the data points remaining after removing the seed data poi
 
 % TODO: active learning -> AL
 Overall our results show AL is a promising approach for reducing the number of playtests needed to train an accurate predictive model.
-In both simulation studies AL \textbf{always} reduced the number of playtests needed. % TODO: check if PI was appropriately implemented...
+In both simulation studies AL almost always reduced the number of playtests needed. % TODO: check if PI was appropriately implemented...
 In both human studies AL was able to reduce the number of playtests in some, but not all, cases.
 No single acquisition function, objective function, or acquisition-objective function pair was optimal across cases.
 These results align with previous work in AL showing that many data-specific properties impact the results \cite{schein2007:al-logreg-eval}.
@@ -506,16 +510,43 @@ Having a clear behavioral objective (being hit a number of times in the game) wa
 In both simulation and human data we found GP-UCB and EI to be most effective.
 Both methods explicitly balance between exploring and exploiting designs, suggesting many parameter tuning objectives involve a balance between considering alternative parameter settings and refining a given setting.
 
-% simulation
-\begin{figure}[tbph]
+\begin{table}[tb]
 \centering
-\includegraphics[width=\linewidth]{regression_simulation}
-\caption{Regression simulation mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
-\label{fig:reg_sim}
+\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of simulated data.}
+\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
+\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
+& GP & KSVM & NE & GP & KSVM & NE \\ 
+\hline random &  &  &  &  &  &  \\ 
+\hline variance &  &  &  &  &  &  \\ 
+\hline PI &  &  &  &  &  &  \\ 
+\hline EI &  &  &  &  &  &  \\ 
+\hline UCB &  &  &  &  &  &  \\ 
+\hline min MSE &  &  &  &  &  &  \\ 
+\hline min MAE &  &  &  &  &  &  \\ 
+\hline 
+\end{tabularx}
+\label{tab:reg_sim}
+\end{table}
+
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\linewidth]{classification_results}
+\caption{Regression mean squared error on predicting number of times player is hit vs number of samples used in training for different objective and acquisition function combinations. Lower values indicate better performance. Top figure uses simulation data, bottom uses human data.}
+\label{fig:reg_all}
 \end{figure}
+
+% simulation
+%\begin{figure}[tbph]
+%\centering
+%\includegraphics[width=\linewidth]{regression_simulation}
+%\caption{Regression simulation mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
+%\label{fig:reg_sim}
+%\end{figure}
+
 %    all 3 methods do quite well
 %    EI asmpytotes to slightly better results
-In simulation all AL methods performed well except for PI (not shown as it distorts the graph scale) (Figure \ref{fig:reg_sim}).
+In simulation all AL methods performed well except for PI (not shown as it distorts the graph scale) (Figure \ref{fig:reg_sim}).\footnote{To avoid clutter only the best acquisition function results are shown for each objective function, along with the best-performing random sampling (among objective functions) as a baseline for comparison.}
 As PI is a pure exploitation strategy it focuses on playtesting parameter settings that are highly certain.
 Because we are tuning three parameters in a fine-grained space this makes it easy to find a bad set of parameters and fail to distinguish among many possible alternatives.
 %
@@ -524,20 +555,38 @@ Because we are tuning three parameters in a fine-grained space this makes it eas
 Roughly 40 playtests were needed to tune the three parameters related to player performance against enemies when using GP-UCB, EI, or variance; random sampling require 175 playtests for comparable performance.
 More playtests marginally improved AL performance.
 
-% human
-\begin{figure}[tbph]
+\begin{table}[tb]
 \centering
-\includegraphics[width=\linewidth]{regression_experiment}
-\caption{Regression human study mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
-\label{fig:reg_expr}
-\end{figure}
+\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of human data.}
+\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
+\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
+& GP & KSVM & NE & GP & KSVM & NE \\ 
+\hline random &  &  &  &  &  &  \\ 
+\hline variance &  &  &  &  &  &  \\ 
+\hline PI &  &  &  &  &  &  \\ 
+\hline EI &  &  &  &  &  &  \\ 
+\hline UCB &  &  &  &  &  &  \\ 
+\hline min MSE &  &  &  &  &  &  \\ 
+\hline min MAE &  &  &  &  &  &  \\ 
+\hline 
+\end{tabularx}
+\label{tab:reg_expr}
+\end{table}
+
+% human
+%\begin{figure}[tbph]
+%\centering
+%\includegraphics[width=\linewidth]{regression_experiment}
+%\caption{Regression human study mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
+%\label{fig:reg_expr}
+%\end{figure}
     % UCB and EI are only ones to do well
     % -- UCB remains at consistently high performance
     % -- EI gradually gets worse over time
     % why?
     % -- variance and PI do not capture exploration and thus have difficulty finding good results
     % -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
-In human studies GP-UCB and EI both performed well, other AL methods did not (Figure \ref{fig:reg_expr}).
+In human studies GP-UCB and EI both performed well, other AL methods did not (Figure \ref{fig:reg_all}).
 We focus our analysis on the GP objective function as NE for regression was unable to outperform a random sampling approach which was worse than all GP method results.
 Gaussian Processes were developed for regression settings so it is not surprising that neural networks---developed for classification---would show relatively poor performance.
 
@@ -562,39 +611,74 @@ In simulation data AL methods---particularly entropy sampling---show significant
 Human data did not show strong improvements for AL methods and only marginal performance improvements for random sampling.
 These results suggest AL works for preference learning when the domain can be modeled as a preference choice, but that our human data was not of this sort.
 
+
+\begin{table}[tb]
+\centering
+\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples.}
+\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
+\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
+& GP & KSVM & NE & GP & KSVM & NE \\ 
+\hline random &  &  &  &  &  &  \\ 
+\hline QBB vote &  &  &  &  &  &  \\ 
+\hline QBB prob &  &  &  &  &  &  \\ 
+\hline entropy &  &  &  &  &  &  \\ 
+\hline error red. &  &  &  &  &  &  \\ 
+\hline var. red. &  &  &  &  &  &  \\ 
+\hline 
+\end{tabularx}
+\label{tab:cls_sim}
+\end{table}
+
 \begin{figure}[tbph]
 \centering
 \includegraphics[width=\linewidth]{classification_results}
-\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
+\caption{Classification F1 score vs number of samples used in training for different objective and acquisition function combinations. Higher values indicate better performance. Top figure uses simulation data, bottom uses human data.}
 \label{fig:cls_all}
 \end{figure}
 
 
 % simulation
-\begin{figure}[tbph]
-\centering
-\includegraphics[width=\linewidth]{classification_simulation}
-\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
-\label{fig:cls_sim}
-\end{figure}
+%\begin{figure}[tbph]
+%\centering
+%\includegraphics[width=\linewidth]{classification_simulation}
+%\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
+%\label{fig:cls_sim}
+%\end{figure}
     % GP random beats KSVM random -> GP is better able to model domain
     % GP entropy shows best trend -> focus on finding out where problems are
     % QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
     % NE most effective; esp QBB vote
     % NE random outdoes others
-In simulation QBB vote and entropy sampling showed strong performance gains across all three objective functions (Figure \ref{fig:cls_sim}).
+In simulation QBB vote and entropy sampling showed strong performance gains across all three objective functions (Figure \ref{fig:cls_all}).
 Previous work has found QBB models are best for high variance data sets \cite{schein2007:al-logreg-eval}.
 Entropy sampling is also effective for high-variance situations.
 The complexity of our simulation model made it a highly variable function to optimize and demonstrates the value of AL methods that can handle these situations.
 
 
-% human
-\begin{figure}[tbph]
+\begin{table}[tb]
 \centering
-\includegraphics[width=\linewidth]{classification_experiment}
-\caption{Classification human study F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
-\label{fig:cls_expr}
-\end{figure}
+\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples.}
+\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
+\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
+& GP & KSVM & NE & GP & KSVM & NE \\ 
+\hline random &  &  &  &  &  &  \\ 
+\hline QBB vote &  &  &  &  &  &  \\ 
+\hline QBB prob &  &  &  &  &  &  \\ 
+\hline entropy &  &  &  &  &  &  \\ 
+\hline error red. &  &  &  &  &  &  \\ 
+\hline var. red. &  &  &  &  &  &  \\ 
+\hline 
+\end{tabularx}
+\label{tab:cls_expr}
+\end{table}
+
+% human
+%\begin{figure}[tbph]
+%\centering
+%\includegraphics[width=\linewidth]{classification_experiment}
+%\caption{Classification human study F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
+%\label{fig:cls_expr}
+%\end{figure}
     % all methods roughly equal
     % GP random does well
     % GP random beats KSVM random -> GP is better able to model domain
@@ -603,7 +687,7 @@ The complexity of our simulation model made it a highly variable function to opt
     % QBB models don't perform 
     % --> QBB + KSVM results suggest consistent domain but complex underlying model
     % only minor gains: ~160 samples to improve, little growth over random
-In human studies only specific acquisition and objective function combinations achieved substantial improvements over random sampling (Figure \ref{fig:cls_expr}).
+In human studies only specific acquisition and objective function combinations achieved substantial improvements over random sampling (Figure \ref{fig:cls_all}).
 %Neural network optimization (NE) was only improved when using entropy-based sampling.
 %These results are surprising given the efficacy of neural nets for preference learning in other contexts and merit additional investigations. % my hunch: fewer features makes it harder
 %
