@@ -75,14 +75,14 @@ Addressing the problem of parameter tuning requires a means to automatically sel
 
 
 % contributions
-Our central insight is to model playtesting as a form of active learning.
-Active learning \cite{settles2012:al-book} involves selecting among a set of possible inputs to get the best output while minimizing the number of inputs tested.
+Our central insight is to model playtesting as a form of active learning (AL).
+Active learning \cite{settles2012:al-book} selects among a set of possible inputs to get the best output while minimizing the number of inputs tested.
 We define the ``best output'' in terms of a parameter tuning design goal and treat a setting for a game design as an ``input.''
 This paper makes three contributions toward machine-driven playtesting:
 \begin{enumerate}
-\item Machine-driven playtesting---a formulation of efficient playtesting as an active learning problem % TODO: "active playtesting"? "machine-driven playtesting"? needs a better name
-\item A definition of a set of playtesting goals in terms of active learning metrics
-\item A case study of a shoot-`em-up game demonstrating the efficacy of active learning to reduce the number of playtests needed to optimize (1) difficulty-related and (2) control-related game parameters
+\item Machine-driven playtesting---a formulation of efficient playtesting as an AL problem % TODO: "active playtesting"? "machine-driven playtesting"? needs a better name
+\item A definition of a set of playtesting goals in terms of AL metrics
+\item A case study of a shoot-`em-up game demonstrating the efficacy of AL to reduce the number of playtests needed to optimize (1) difficulty-related and (2) control-related game parameters
 \end{enumerate}
 
 % differences from prior work
@@ -95,9 +95,9 @@ Our approach complements these tools for early-stage testing with late-stage ref
 
 % roadmap
 In the remainder of the paper we first compare our approach to related efforts at game design support.
-We next define a set of parameter tuning design goals and relate them to active learning approaches.
+We next define a set of parameter tuning design goals and relate them to AL approaches.
 Following this we describe a case study of automated playtesting using a shoot-`em-up game.
-After describing the game used we present results showing the efficacy of active learning to model a known simulated player model and human data collected from an online study.
+After describing the game used we present results showing the efficacy of AL to model a known simulated player model and human data collected from an online study.
 We conclude with a discussion of the limitations, applications, and potential extensions to this playtesting approach.
 
 
@@ -107,11 +107,11 @@ We conclude with a discussion of the limitations, applications, and potential ex
 \section{Related Work}
 
 % overview
-Two research areas are closely related to automated playtesting: offline game design tools and online game adaptation.
+Two research areas are closely related to machine playtesting: offline game design tools and online game adaptation.
 Offline game design tools enable designers to explore possible game designs by defining a high-level space of games through a design language.
 Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
-Offline game design tools enable designers to explore possible game designs by defining a high-level space of games through a design language.
-Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
+Online game adaptation changes game designs in real-time based on player actions or game state.
+Examples include designer authored rules or data-driven player models coupled to optimization techniques.
 
 
 
@@ -167,8 +167,15 @@ When optimizing models learned from data, automated playtesting informs the choi
 We argue that research to date has ignored the problem of reducing ``sample complexity''---the number of data points (human tests) needed to train a model.
 Active learning makes explicit the trade-off in playtesting between ``exploring'' potentially valuable game design settings and ``exploiting'' known good solutions with small changes.
 %Active learning complements the above approaches by providing a principled method for reducing the number of playtests needed without changing the fundamental models involved.
-Thus, active learning complement online game adaptation through reducing the number of mediocre or bad sets of game parameters players experience before arriving at good parameter settings without changing the underlying models used.
+Thus, AL complements online game adaptation through reducing the number of mediocre or bad sets of game parameters players experience before arriving at good parameter settings without changing the underlying models used.
 
+
+\todo[inline]{not sure where to slot this in}
+% previous AL approaches
+Our approach complements prior uses of AL for game design by focusing on efficiently improving designs for player behavior and experience.
+Normoyle et al. \cite{normoyle2012:al-metrics} use AL to recommend sets of useful player metrics to track; we pick design settings to improve player experience.
+Rafferty et al. \cite{rafferty2012:opt-cog-game} optimize game designs offline to learn the most about player cognition; we use an online process and explore a variety of alternative AL approaches.
+We extend these efforts with a wider variety of AL metrics and tasks while addressing the cost of playtesting.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,12 +186,12 @@ Our goal is to reduce the playtesting burden by efficiently choosing game design
 Active learning (AL) provides a generic set of techniques to guide the playtesting process of choosing a set of design parameters to test toward achieving a design goal.
 Playtesting typically involves trade-offs between testing designs that are poorly understood (exploration) and refining designs that are known to be good but need minor changes (exploitation).
 Active learning captures this intuition through explicit models of the exploration-exploitation trade-off.
-In the following sections we will define active learning in the playtesting context and provide the intuition behind several common active learning methods.
-Our aim is to characterize playtesting in terms of active learning; full mathematical treatments are available through the references.
+In the following sections we will define AL in the playtesting context and provide the intuition behind several common AL methods.
+Our aim is to characterize playtesting in terms of AL; full mathematical treatments are available through the references.
 
 
 \subsection{Playtesting as Active Learning}
-Machine-driven playtesting---AL for game design---uses a model of how a design works to choose how to change that design to achieve a design goal.
+Machine-driven playtesting---active learning for game design---uses a model of how a design works to choose how to change that design to achieve a design goal.
 Formally, the design goal is known as the \textit{objective function} and captures the relationship between input (game design parameters) and desired output (game design goals).
 An \textit{acquisition function} takes information on expected outputs from the objective function and uses it to decide on the next set of inputs to test.
 
@@ -319,7 +326,7 @@ Subjective responses goals cover cases where designers desire specific player su
 % % enemy params
 The shoot-`em-up game is based on space ship combat over a series of waves.
 During each wave a series of enemies appear that fire bullets at the player. 
-To test active learning for regression we set a game play behavior design goal of the player being hit exactly six times during each wave of enemies and tuned enemy parameters.
+To test AL for regression we set a game play behavior design goal of the player being hit exactly six times during each wave of enemies and tuned enemy parameters.
 We varied the: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
 Increasing bullet size requires the player to move more carefully to avoid bullets. 
 Faster bullets require quicker player reflexes to dodge incoming fire. 
@@ -329,7 +336,7 @@ Getting approximate settings for these parameters is easy, but fine-tuning them 
 
 
 % % control params
-To test active learning for classification we set a subjective response design goal of the player evaluating a set of controls as better than the previous set and tuned player control parameters.
+To test AL for classification we set a subjective response design goal of the player evaluating a set of controls as better than the previous set and tuned player control parameters.
 We varied two ship movement parameters: drag and thrust. 
 Drag is the ``friction'' applied to a ship that decelerates the moving ship at a constant rate when it is moving---larger values cause the ship to stop drifting in motion sooner. 
 Thrust is the ``force'' a player movement press applies to accelerate the ship---larger values cause the ship to move more rapidly when the player presses a key to move. 
@@ -346,20 +353,20 @@ We provided a fourth option of ``no different'' for when players could not disti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Experiments}
-Our experiments sought to test whether the active learning framework could reduce the number of human playtests needed to tune design parameters compared to a random sampling approach.
+Our experiments sought to test whether the AL framework could reduce the number of human playtests needed to tune design parameters compared to a random sampling approach.
 Random sampling is the standard method used to evaluate the efficacy of AL models for improving model fits for a fixed number of playtests \cite{settles2012:al-book}. This is similar to A/B testing approaches that capture large amounts of data before acting on the results.
 
-In two experiments we used the active learning acquisition functions given above for tuning enemy parameters or tuning player controls.
+In two experiments we used the AL acquisition functions given above for tuning enemy parameters or tuning player controls.
 Both experiments involved a preliminary test on simulated data followed by testing with human participants.
 The simulation experiments allowed us to verify that our methods would work in principle; humans studies show our method can apply to real-world contexts.
 
 In each study we employed three different objective functions---Gaussian Processes (GP), kernel support vector machines (KSVM), and optimized neural networks (``neuro-evolution'', NE).
-We chose these objective functions as they cover several player modeling approaches used in this domain: GPs are a common model in active learning contexts \cite{brochu2010:thesis}, kernel methods (particularly KSVMs) are a popular machine learning technique previously used in player modeling \cite{yu2011:minboredom}, and optimized neural networks have been widely used in preference learning \cite{yannakakis2011:edpcg}.\footnote{For computational reasons we employ a simple gradient-based optimization method, rather than the more common neuro-evolutionary approaches. We did not find any performance differences between the two optimization approaches in initial tests in our domain.}
+We chose these objective functions as they cover several player modeling approaches used in this domain: GPs are a common model in AL contexts \cite{brochu2010:thesis}, kernel methods (particularly KSVMs) are a popular machine learning technique previously used in player modeling \cite{yu2011:minboredom}, and optimized neural networks have been widely used in preference learning \cite{yannakakis2011:edpcg}.\footnote{For computational reasons we employ a simple gradient-based optimization method, rather than the more common neuro-evolutionary approaches. We did not find any performance differences between the two optimization approaches in initial tests in our domain.}
 All three of these objective functions can be trained in regression or classification modes.
 KSVMs do not have probabilistic predictions in regression mode and NE do not produce probabilistic predictions, limiting the acquisition functions they are paired with.
 
 % enemy tuning summary
-Our results show active learning can reduce the number of human playtests needed.
+Our results show AL can reduce the number of human playtests needed.
 For enemy parameter tuning (a regression problem) we find GPs with UCB or EI have the best performance in both simulation and on human data.
 Variance performs well in simulation but poorly with humans; likely due to human players having more variability in playing behavior than our simulated models.
 
@@ -367,7 +374,7 @@ Variance performs well in simulation but poorly with humans; likely due to human
 For control tuning (a classification problem) we find QBB vote and entropy have competitive performance in simulation.
 On human data GPs show good performance using QBB probability with few (roughly 80) samples while KSVMs show good performance using QBB probability with more (roughly 280) samples; NE showed the best performance overall and little difference among techniques used.
 Our control tuning results show a generic set of controls all players agree on as good is difficult to obtain.
-Combined across experiments, these results show active learning has promise for helping to automate low-level parameter tuning.
+Combined across experiments, these results show AL has promise for helping to automate low-level parameter tuning.
 
 In the following sections we detail our experimental design for both the simulated players and human participants.
 We then discuss the results of our tests in detail.
@@ -400,7 +407,7 @@ We then discuss the results of our tests in detail.
 % % NE regression
 
 \subsection{Simulation Methods}
-We devised two simple models of how players might respond to different design paramters to verify our active learning approach on ground truth information.
+We devised two simple models of how players might respond to different design paramters to verify our AL approach on ground truth information.
 Our regression model treats players as having an underlying set of skills related to each enemy tuning parameter along with a cross-skill rate of making errors.
 Greater differences between player skills and enemy parameters lead to larger differences from being hit at a base rate.
 Our classification model treats players as having preferences for each of the control tuning parameters along with a cross-parameter tolerance for differences from preference.
@@ -415,7 +422,7 @@ Preference choices are based on the difference between the ideal set of paramete
 Our regression model is a probabilistic model of player behavior in terms of underlying player skills and design parameters.
 Playtest players have three independent skills for enemy bullet size, bullet speed, and firing rate; all three skills are sampled from a normal distribution with a variance term capturing variability in skill.
 Taking the difference between the player-specific skills and the design parameters, then scaling by the error in player skills produces an estimated rate of being hit by enemies in our game.
-When training simulated models we generated a fixed ideal playtester and allowed the active learning model to choose sets of enemy parameters along a 10 x 10 x 10 grid.
+When training simulated models we generated a fixed ideal playtester and allowed the AL model to choose sets of enemy parameters along a 10 x 10 x 10 grid.
 
 
 
@@ -442,7 +449,7 @@ We square the difference to penalize sets of parameters that differ from the ide
 In each cross-validation fold we generated a set of 30 initial randomly sampled design parameter settings and used the simulated models to generate playtester responses.
 These settings and responses formed the initial training data set.
 An additional set of 100 testing points was generated in the same way.
-We then created the grid of points the active learning model could sample, forming the training pool.
+We then created the grid of points the AL model could sample, forming the training pool.
 Finally, we created a set of 100 randomly sampled design parameters and 
 Within each fold we then repeated the following process:
 \begin{enumerate}
@@ -481,7 +488,7 @@ We retained only preference responses during the first 10 waves of play to avoid
 %% if binary but no wave -> 47 players, 318 points [current]
 %% if binary min 10 waves -> 41 players, 296 points
 
-Our active learning evaluation used this dataset with the same process as described for the simulation approaches above.
+Our AL evaluation used this dataset with the same process as described for the simulation approaches above.
 We trained each objective function to predict preference responses using only the control settings for the most recent wave and the control settings for the previous wave.
 Note that we did not collect preference comparisons after the first wave of the game as players could not yet compare control settings.
 
@@ -494,7 +501,6 @@ The training pool was the data points remaining after removing the seed data poi
 
 \section{Results}
 
-% TODO: active learning -> AL
 Overall our results show AL is a promising approach for reducing the number of playtests needed to train an accurate predictive model.
 In both simulation studies AL almost always reduced the number of playtests needed. % TODO: check if PI was appropriately implemented...
 In both human studies AL was able to reduce the number of playtests in some, but not all, cases.
