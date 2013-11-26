@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{booktabs}
 \newcommand{\mytodo}[1]{\textbf{[[#1]]}}
 
 \begin{document}
@@ -386,8 +387,10 @@ We then discuss the results of our tests in detail.
 % real: drop in performance to tied worst late classifier (0.78 @ 280); best early (0.74 @ 80)
 %
 % % GP regression
-% % GP UCB for sim; GP UCB for real
-% sim: 
+% % GP UCB for sim; GP UCB for real; variance gradually catches up, EI gets worse w/more (to point of random)
+% sim: PI gets worse; min MSE/MAE do badly; EI/UCB/variance competitive, EI asymptotes better but more erratic w/fewer
+%	UCB: 0.00128 @ 80; 0.0011 @ 280
+%	EI: 0.00137 @ 80; 0.00098 @ 280
 % real: GP UCB best (200 @ 80; 225 @ 280) 
 %	note: random beats neuro random, ksvm random badly (260 @ 80 vs 510 vs 633; 240 @ 280 vs 500 vs 685)
 
@@ -397,7 +400,8 @@ We then discuss the results of our tests in detail.
 % real: best late classifier (0.81 @ 280)
 %
 % % KSVM regression
-% 
+% sim: random best (0.0015 @ 80; 0.00097 @ 280); MSE/MAE both bad
+% real: min MSE best (634 @ 80; 688 @ 280); gradually drops to random (min MAE always worse)
 
 % % NE classification
 % % QBB vote for sim; QBB vote for real (prob much worse, but doesn't make sense)
@@ -405,6 +409,8 @@ We then discuss the results of our tests in detail.
 % real: worst classifier (0.71 @ 80; 0.76 @ 280)
 %
 % % NE regression
+% sim: random best (0.0016 @ 80; 0.0010 @ 280)
+% real: random best (509 @ 80; 500 @ 280)
 
 \subsection{Simulation Methods}
 We devised two simple models of how players might respond to different design paramters to verify our AL approach on ground truth information.
@@ -508,6 +514,8 @@ No single acquisition function, objective function, or acquisition-objective fun
 These results align with previous work in AL showing that many data-specific properties impact the results \cite{schein2007:al-logreg-eval}.
 Below we provide more details on these results with an emphasis on how AL impacted the need for playtesting.
 
+% % argue GP standard regression, prob model helps AL use
+% % GP non-standard for classification -> others
 
 \subsection{Regression}
 
@@ -516,28 +524,70 @@ Having a clear behavioral objective (being hit a number of times in the game) wa
 In both simulation and human data we found GP-UCB and EI to be most effective.
 Both methods explicitly balance between exploring and exploiting designs, suggesting many parameter tuning objectives involve a balance between considering alternative parameter settings and refining a given setting.
 
-\begin{table}[tb]
-\centering
-\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of simulated data.}
-\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
-\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
-& GP & KSVM & NE & GP & KSVM & NE \\ 
-\hline random &  &  &  &  &  &  \\ 
-\hline variance &  &  &  &  &  &  \\ 
-\hline PI &  &  &  &  &  &  \\ 
-\hline EI &  &  &  &  &  &  \\ 
-\hline UCB &  &  &  &  &  &  \\ 
-\hline min MSE &  &  &  &  &  &  \\ 
-\hline min MAE &  &  &  &  &  &  \\ 
-\hline 
-\end{tabularx}
+% http://www.tablesgenerator.com/
+
+%\begin{table}[tb]
+%\centering
+%\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of simulated data (units are $10^{-2}$).}
+%\begin{tabularx}{0.48\textwidth}{|X|c|c|c|c|c|c|}
+%\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
+%& GP & KSVM & NE & GP & KSVM & NE \\ 
+%\hline random & 1.91 & 1.58 & 1.62 
+% & 1.36 & 1.29 & 1.31 \\ 
+%\hline variance & 1.50 & - & - 
+% & 1.39 & - & - \\ 
+%\hline PI & 8.32 & - & - 
+% & 6.38 & - & - \\ 
+%\hline EI & 1.60 & - & - 
+% & 1.30 & - & - \\ 
+%\hline UCB & 1.48 & - & - 
+% & 1.38 & - & - \\ 
+%\hline min MSE & 3.01 & 2.65 & 2.70 
+% & 2.54 & 2.66 & 2.78 \\ 
+%\hline min MAE & 2.85 & 2.65 & 2.64 
+% & 2.53 & 2.69 & 2.66 \\ 
+%\hline 
+%\end{tabularx}
+%\label{tab:reg_sim}
+%\end{table}
+
+% Please remember to add \use{multirow} to your document preamble in order to suppor multirow cells
+% Booktabs require to add \usepackage{booktabs} to your document preamble
+%\begin{table}[h]
+%\begin{tabular}{@{}lllllll@{}}
+%\toprule
+%\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{l}{MSE 80 samples} & \multicolumn{3}{l}{MSE 280 samples} \\ \cmidrule(l){2-7} 
+%                                                                                & GP         & KSVM      & NE        & GP         & KSVM       & NE        \\ \midrule
+%random                                                                          & 1.91       & 1.58      & 1.62      & 1.36       & 1.29       & 1.31      \\ \midrule
+%variance                                                                        & 1.50       & -         & -         & 1.39       & -          & -         \\ \midrule
+%PI                                                                              & 8.32       & -         & -         & 6.38       & -          & -         \\ \midrule
+%EI                                                                              & 1.60       & -         & -         & 1.30       & -          & -         \\ \midrule
+%UCB                                                                             & 1.48       & -         & -         & 1.38       & -          & -         \\ \midrule
+%min MSE                                                                         & 3.01       & 2.65      & 2.70      & 2.54       & 2.66       & 2.78      \\ \midrule
+%min MAE                                                                         & 2.85       & 2.65      & 2.64      & 2.53       & 2.69       & 2.66      \\ \bottomrule
+%\end{tabular}
+%\end{table}
+
+\begin{table}[h]
+\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of simulated data (units $10^{-2}$).}
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|l|}{MSE 80 samples} & \multicolumn{3}{|l|}{MSE 280 samples} \\ \cline{2-7} 
+                                                                                & GP         & KSVM       & NE         & GP          & KSVM       & NE         \\ \hline
+random                                                                          & 1.91       & 1.58       & 1.62       & 1.36        & 1.29       & 1.31       \\ \hline
+variance                                                                        & 1.50       & -          & -          & 1.39        & -          & -          \\ \hline
+PI                                                                              & 8.32       & -          & -          & 6.38        & -          & -          \\ \hline
+EI                                                                              & 1.60       & -          & -          & 1.30        & -          & -          \\ \hline
+UCB                                                                             & 1.48       & -          & -          & 1.38        & -          & -          \\ \hline
+%min MSE                                                                         & 3.01       & 2.65       & 2.70       & 2.54        & 2.66       & 2.78       \\ \hline
+%min MAE                                                                         & 2.85       & 2.65       & 2.64       & 2.53        & 2.69       & 2.66       \\ \hline
+\end{tabular}
 \label{tab:reg_sim}
 \end{table}
 
-
 \begin{figure}[tb]
 \centering
-\includegraphics[width=\linewidth]{classification_results}
+\includegraphics[width=\linewidth]{regression_results}
 \caption{Regression mean squared error on predicting number of times player is hit vs number of samples used in training for different objective and acquisition function combinations. Lower values indicate better performance. Top figure uses simulation data, bottom uses human data.}
 \label{fig:reg_all}
 \end{figure}
@@ -564,18 +614,18 @@ More playtests marginally improved AL performance.
 \begin{table}[tb]
 \centering
 \caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of human data.}
-\begin{tabularx}{0.46\textwidth}{|X|c|c|c|c|c|c|}
-\hline \multirow{2}{*}{\parbox[t]{5cm}{acquisition \\ function}} & \multicolumn{3}{|c|}{MSE 80 samples} & \multicolumn{3}{|c|}{MSE 280 samples}  \\ \cline{2-7}
-& GP & KSVM & NE & GP & KSVM & NE \\ 
-\hline random &  &  &  &  &  &  \\ 
-\hline variance &  &  &  &  &  &  \\ 
-\hline PI &  &  &  &  &  &  \\ 
-\hline EI &  &  &  &  &  &  \\ 
-\hline UCB &  &  &  &  &  &  \\ 
-\hline min MSE &  &  &  &  &  &  \\ 
-\hline min MAE &  &  &  &  &  &  \\ 
-\hline 
-\end{tabularx}
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|l|}{MSE 80 samples} & \multicolumn{3}{|l|}{MSE 280 samples} \\ \cline{2-7} 
+                                                                                & GP         & KSVM        & NE        & GP         & KSVM        & NE         \\ \hline
+random                                                                          & 136        & 379         & 268       & 124        & 374         & 261        \\ \hline
+variance                                                                        & 121        & -           & -         & 120        & -           & -          \\ \hline
+PI                                                                              & 133        & -           & -         & 123        & -           & -          \\ \hline
+EI                                                                              & 112        & -           & -         & 127        & -           & -          \\ \hline
+UCB                                                                             & 107        & -           & -         & 117        & -           & -          \\ \hline
+%min MSE                                                                         &            & 328         & 303       &            & 355         & 294        \\ \hline
+%min MAE                                                                         &            & 364         &           &            & 396         &            \\ \hline
+\end{tabular}
 \label{tab:reg_expr}
 \end{table}
 
