@@ -35,9 +35,10 @@ anonymous
 
 \maketitle
 \begin{abstract}
-Game designers often use human playtesting to gather feedback about game design elements when iteratively improving a game.
+Game designers use human playtesting to gather feedback about game design elements when iteratively improving a game.
 Playtesting, however, is expensive: human testers must be recruited, playtest results must be aggregated and interpreted, and changes to game designs must be extrapolated from these results.
-We argue that active learning techniques can be used to formalize and automate a subset of playtesting goals.
+Can automated methods reduce this expense?
+We show how active learning techniques can formalize and automate a subset of playtesting goals.
 Specifically, we focus on the low-level parameter tuning required to balance a game once the mechanics have been chosen.
 Through a case study on a shoot-`em-up game we demonstrate the efficacy of active learning to reduce the amount of playtesting needed to choose the optimal set of game parameters for a given (formal) design objective.
 This work opens the potential for additional methods to reduce the human burden of performing playtesting for a variety of relevant design concerns.
@@ -76,9 +77,10 @@ Addressing the problem of parameter tuning requires a means to automatically sel
 
 
 % contributions
-Our central insight is to model playtesting as a form of active learning (AL).
+Our primary insight is to model playtesting as a form of active learning (AL).
 Active learning \cite{settles2012:al-book} selects among a set of possible inputs to get the best output while minimizing the number of inputs tested.
 We define the ``best output'' in terms of a parameter tuning design goal and treat a setting for a game design as an ``input.''
+Minimizing the number of inputs tested minimizes the number of playtests performed.
 This paper makes three contributions toward machine-driven playtesting:
 \begin{enumerate}
 \item Machine-driven playtesting---a formulation of efficient playtesting as an AL problem % TODO: "active playtesting"? "machine-driven playtesting"? needs a better name
@@ -87,6 +89,7 @@ This paper makes three contributions toward machine-driven playtesting:
 \end{enumerate}
 
 % differences from prior work
+We believe machine-driven playtesting is a novel use of machine learning in games.
 Unlike prior work in dynamic difficulty and adaptive games we focus on the case of deciding on a fixed design for future use.
 Our approach can be applied to online game adjustments to more rapidly converge on the right set of game parameters.
 %Further, by learning a model of how design parameters influence playtest results our approach is able to provide designers additional feedback on their ``design space'' at design time.
@@ -110,9 +113,9 @@ We conclude with a discussion of the limitations, applications, and potential ex
 % overview
 Two research areas are closely related to machine playtesting: offline game design tools and online game adaptation.
 Offline game design tools enable designers to explore possible game designs by defining a high-level space of games through a design language.
-Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
+%Examples include support for generating or evaluating design in terms of hard constraints (what must be true) or soft optimization (what to achieve to the best degree possible).
 Online game adaptation changes game designs in real-time based on player actions or game state.
-Examples include designer authored rules or data-driven player models coupled to optimization techniques.
+%Examples include designer authored rules or data-driven player models coupled to optimization techniques.
 
 
 
@@ -126,12 +129,11 @@ Model-checking tools define game mechanics in a logical language to provide hard
 Bauer et al. \cite{bauer2013:rrt-generation} and Cook et al. \cite{cook2012:coopcoevo} use sampling methods to evaluate platformer game level playability.
 Shaker et al. \cite{shaker2013:ropossum-test} combine a rule-based reasoning approach with simulation to generate content for a physics-based game.
 Simulation approaches are valuable when design involves an intractably large space of possible parameters to test and can serve as input to optimization techniques.
-Active learning can enhance simulation approaches by guiding the sampling process toward spaces of parameters likely to be of greater value.
-
+%
 % model-checking
 Model-checking approaches provide guarantees on generated designs having formally defined properties---typically at the cost of being limited to more coarse design parameter decisions.
-Smith et al. \cite{smith2013:quantify-play}, Butler et al. \cite{butler2013:progression-tool}, and Horswill and Foged \cite{horswill2012:levelgen} employ logic programming and constraint solving to generating levels or sets of levels meeting given design constraints.
-Jaffe et al. \cite{jaffe2012:balance} employ game-theoretic analysis to understand the trade-offs of game design parameters for balance in a competitive game.
+Smith et al. \cite{smith2013:quantify-play}, Butler et al. \cite{butler2013:progression-tool}, and Horswill and Foged \cite{horswill2012:levelgen} use logic programming and constraint solving to generating levels or sets of levels meeting given design constraints.
+Jaffe et al. \cite{jaffe2012:balance} use game-theoretic analysis to understand the effects of game design parameters on competitive game balance.
 
 % differences of playtest vs model-check -> value to designers
 Our approach to automated playtesting is intended to complement these approaches to high-level early design exploration with low-level optimization of game parameters and tuning.
@@ -162,38 +164,42 @@ Hastings et al. \cite{hastings2009:gar}, Shaker et al. \cite{shaker2013:crowdsou
 Harrison and Roberts \cite{harrison2013:scrabble-retention} optimize player retention and Zook and Riedl \cite{zook2012:tf} optimize game difficulty using similar techniques.
 
 %Both rule-based and data-driven online adaptation approaches target real-time adjustments of a game to known design goals.
-Automated playtesting extends these approaches by providing principled methods for guiding the process of designing hand-crafted rules or optimizing game parameters.
+%Active learning can enhance simulation approaches by guiding the sampling process toward spaces of parameters likely to be of greater value.
+Automated playtesting extends these approaches with principled methods to guide the process of designing hand-crafted rules or optimizing game parameters.
 When hand-crafting rules, automated playtesting informs the choice of which rule parameters to use.
 When optimizing models learned from data, automated playtesting informs the choice of which next set of parameters to test during the optimization process.
-We argue that research to date has ignored the problem of reducing ``sample complexity''---the number of data points (human playtests) needed to train a model.
-Active learning makes explicit the trade-off in playtesting between ``exploring'' potentially valuable game design settings and ``exploiting'' known good solutions with small changes.
+We argue research to date has ignored the problem of reducing ``sample complexity''---the number of data points (human playtests) needed to train a model.
+Active learning makes the trade-off in playtesting between ``exploring'' potentially valuable game design settings and ``exploiting'' known good solutions with small changes explicit.
 %Active learning complements the above approaches by providing a principled method for reducing the number of playtests needed without changing the fundamental models involved.
 Thus, AL complements online game adaptation through reducing the number of mediocre or bad sets of game parameters players experience before arriving at good parameter settings without changing the underlying models used.
 
 
-\todo[inline]{not sure where to slot this in}
+
+
+\subsection{Active Learning in Games}
+
+There are other uses of AL in games.
 % previous AL approaches
-Our approach complements prior uses of AL for game design by focusing on efficiently improving designs for player behavior and experience.
 Normoyle et al. \cite{normoyle2012:al-metrics} use AL to recommend sets of useful player metrics to track; we pick design settings to improve player experience.
 Rafferty et al. \cite{rafferty2012:opt-cog-game} optimize game designs offline to learn the most about player cognition; we use an online process and explore a variety of alternative AL approaches.
-We extend these efforts with a wider variety of AL approaches while addressing the cost of playtesting.
+Our approach complements prior uses of AL for game design by focusing on efficiently improving designs for player behavior and experience.
+We extend these efforts with a wider variety of AL methods while addressing the cost of playtesting.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Active Learning}
+\section{Playtesting as Active Learning}
 
 Our goal is to reduce the playtesting burden by efficiently choosing game designs to test on players.
 Active learning (AL) provides a generic set of techniques to guide the playtesting process of choosing a set of design parameters to test toward achieving a design goal.
 Playtesting typically involves trade-offs between testing designs that are poorly understood (exploration) and refining designs that are known to be good but need minor changes (exploitation).
 Active learning captures this intuition through explicit models of the exploration-exploitation trade-off.
-In the following sections we will define AL in the playtesting context and provide the intuition behind several common AL methods.
-Our aim is to characterize playtesting in terms of AL; full mathematical treatments are available through the references.
+In this section we characterize playtesting in terms of AL.
+We provide intuition behind AL, but full mathematical treatments are available through the references.
 
 
-\subsection{Playtesting as Active Learning}
 Machine-driven playtesting---active learning for game design---uses a model of how a design works to choose how to change that design to achieve a design goal.
-Formally, the design goal is known as the \textit{objective function} and captures the relationship between input (game design parameters) and desired output (game design goals).
+Formally, the design goal is known as the \textit{objective function} and captures the relationship between input (game design parameters) and desired output (game design goals: specific player behaviors or subjective responses).
 An \textit{acquisition function} takes information on expected outputs from the objective function and uses it to decide on the next set of inputs to test.
 
 Objective functions come in two forms: regression and classification models.
@@ -210,39 +216,65 @@ For classification models we cover the most common frameworks for AL with discre
 
 \subsection{Regression Models}
 %% regression
+Acquisition functions choose which input parameters to test next.
+Acquisition functions vary along a spectrum of exploration---playtesting by picking designs that are least understood---and exploitation---picking designs that are expected to be best.
 We consider four acquisition functions for regression models: (1) variance, (2) probability of improvement, (3) expected improvement, and (4) upper-confidence bounds.
 These acquisition functions have been developed in the field of Bayesian experimental design and apply generally to any regression model with a probabilistic interpretation \cite{chaloner1995}.
+Regression models are useful when design goals fall along a continuous scale; we examine player behavior, specifically studying performance as damage taken.
+
+
+Regression acquisition functions include:
+\begin{description}
+\item[Variance] Picks the input with greatest output uncertainty \cite{brochu2010:thesis}. 
+Corresponds to picking the design that is hardest to predict the outcomes from. 
+Exploration.
+%
+\item[Probability of improvement (PI)] Picks the input that most likely to improves the over the best previous output \cite{brochu2010:thesis}. 
+Corresponds to picking the design most likely to improve over the current best. 
+Exploitation.
+%
+\item[Expected Improvement (EI)] Picks the input by weighting the probability of output improvement by the amount of improvement \cite{brochu2010:thesis}.
+Corresponds to picking the design with largest expected improvement.
+Balances exploration and exploitation, but more computationally costly.
+%
+\item[Upper Confidence Bound (UCB)] Picks the input with combined greatest expected value and uncertainty \cite{srinivas2010:gp-ucb}.
+Corresponds to picking designs that seem high quality but are poorly understood to gradually narrow the space of design to be known good or expected bad but uncertain.
+The approach cited gradually reduces the weighting of uncertainty to help converge on an answer.
+Balances exploration and exploitation.
+\end{description}
+
 % variance
-The \textit{variance} acquisition function picks designs based purely on the uncertainty of the design goal value \cite{brochu2010:thesis}.
-Intuitively, variance encodes a playtesting strategy of attempting any design that is poorly understood until the entire design space is well-understood.
-Variance approaches are pure exploration and are useful when design information on many possibilities is needed.
+%The \textit{variance} acquisition function picks designs based purely on the uncertainty of the design goal value \cite{brochu2010:thesis}.
+%Intuitively, variance encodes a playtesting strategy of attempting any design that is poorly understood until the entire design space is well-understood.
+%Variance approaches are pure exploration and are useful when design information on many possibilities is needed.
 
 % probability of improvement
-\textit{Probability of improvement} (PI) improves on uncertainty by selecting the design that is most likely to gain some improvement of the best design observed so far \cite{brochu2010:thesis}. 
-Intuitively, probability of improvement is a playtesting strategy of attempting the design that seems most likely to improve over what has been tried so far.
-Probability of improvement approaches are pure exploitation and are effective when performing minor tweaks to already-effective designs.
+%\textit{Probability of improvement} (PI) improves on uncertainty by selecting the design that is most likely to gain some improvement of the best design observed so far \cite{brochu2010:thesis}. 
+%Intuitively, probability of improvement is a playtesting strategy of attempting the design that seems most likely to improve over what has been tried so far.
+%Probability of improvement approaches are pure exploitation and are effective when performing minor tweaks to already-effective designs.
 
 % expected improvement
-\textit{Expected improvement} (EI) enhances PI by weighting the probability of each design improvement by the amount of improvement \cite{brochu2010:thesis}.
-%Unlike probability of improvement or variance, EI balances between exploration and exploitation.
-Intuitively, EI seeks designs that are likely to have large improvements over the existing design.
-%Mathematically EI is typically very computationally expensive, though for certain objective functions it has analytic solutions that are readily used.
-%Below we use one such objective function, the Gaussian Process \cite{rasmussen2006}.
-%By balancing exploration and exploitation EI is a more general-purpose technique useful for playtesting during many stages of the development cycle.
-Compared to PI, EI is more computationally expensive, though certain objective functions have cheap analytic solutions.
+%\textit{Expected improvement} (EI) enhances PI by weighting the probability of each design improvement by the amount of improvement \cite{brochu2010:thesis}.
+%%Unlike probability of improvement or variance, EI balances between exploration and exploitation.
+%Intuitively, EI seeks designs that are likely to have large improvements over the existing design.
+%%Mathematically EI is typically very computationally expensive, though for certain objective functions it has analytic solutions that are readily used.
+%%Below we use one such objective function, the Gaussian Process \cite{rasmussen2006}.
+%%By balancing exploration and exploitation EI is a more general-purpose technique useful for playtesting during many stages of the development cycle.
+%Compared to PI, EI is more computationally expensive, though certain objective functions have cheap analytic solutions.
 
 % upper confidence bounds
-\textit{Upper Confidence Bound} (UCB) methods select designs based on the upper bound on design quality according to an objective function model of design quality and variability \cite{srinivas2010:gp-ucb}.
-Designs that are expected to be high quality but are also poorly understood (and thus highly variable) are given priority.
-By testing these designs UCB narrows down the space of designs to those known to be good or unknown but likely to be bad.
-In the UCB approach cited above the importance of variability is gradually scaled down as more playtests are run.
-Intuitively, this capture the notion of initially exploring a variety of possible designs and gradually converging to exploit the most promising designs.
+%\textit{Upper Confidence Bound} (UCB) methods select designs based on the upper bound on design quality according to an objective function model of design quality and variability \cite{srinivas2010:gp-ucb}.
+%Designs that are expected to be high quality but are also poorly understood (and thus highly variable) are given priority.
+%By testing these designs UCB narrows down the space of designs to those known to be good or unknown but likely to be bad.
+%In the UCB approach cited above the importance of variability is gradually scaled down as more playtests are run.
+%Intuitively, this capture the notion of initially exploring a variety of possible designs and gradually converging to exploit the most promising designs.
 
 % some kind of wrap-up?
 
 
 \subsection{Classification Models}
 %% classification
+Classification models are useful when design goals involve discrete choices; we examine player subjective ratings, specifically studying preference choices when picking between sets of controls.
 We consider five acquisition functions for classification models: (1) entropy, (2) query-by-bagging voting, (3) query-by-bagging probability, (4) expected error reduction, and (5) variance reduction.
 These acquisition functions have been developed for general classification models with only entropy requiring probabilistic predictions.
 % entropy
@@ -252,44 +284,80 @@ These acquisition functions have been developed for general classification model
 % (3) entropy
 % (4) expected error reduction
 % (5) variance reduction
-\textit{Entropy} acquisition functions choose designs that are most uncertain according to entropy \cite{settles2012:al-book}.
-Entropy measures the amount of information needed to encode a distribution.
-Intuitively, this captures how uncertain a model is about the possible (discrete) outcomes, emphasizing exploration of possibilities.
-Entropy sampling acts similarly to variance-based sampling for regression.
+
+\begin{description}
+\item[Entropy] Picks input with greatest output uncertainty according to entropy---a measure of information needed to encode a distribution \cite{settles2012:al-book}.
+Corresponds to picking designs where player choices are most uncertain.
+Exploration.
+%
+\item[Query-By-Bagging (QBB)] Trains multiple copies of a classification model on random subsets of existing input-output data and picks next input with greatest disagreement among those models \cite{settles2012:al-book}.
+Corresponds to picking designs with greatest variability in expected outcomes when viewed based on different subsets of playtest data.
+Exploration.
+Two varieties are relevant:
+\begin{description}
+\item[QBB vote] Each model votes on predicted output for each potential input.
+The input with the greatest difference between its top two output options is then picked.
+\item[QBB probability] Each model predicts the probability of each predicted output for each potential input.
+The input with most uncertain averaged output probability is then picked \cite{abe1998:qbb}.
+\end{description}
+%
+\item[Expected Error Reduction] Picks the input that, if used to train the model, will give greatest expected reduction in model error when predicting on the remaining inputs.
+Corresponds to picking designs that will most improve prediction of the design outcomes over the design as a whole.
+Balances exploration and exploitation but very computationally expensive.
+The algorithm performs the following steps:
+\begin{enumerate}
+\item Pick a potential input and assign one of the possible outputs to make a ``fake'' training point.
+\item Train a new classification model using the fake point and compute the error over the remaining input points.
+\item Repeat (1) and (2) for all possible outputs and compute the average (``expected'') error across possible outputs.
+\item Repeat (1) through (3) for all inputs.
+\item Pick the input with greatest difference between expected error and current model expected error.
+\end{enumerate}
+%An unlabeled data point is selected and assigned one of the possible labels.
+%This ``fake'' data point is used to train a new objective function model and the error of that model is calculated over all remaining unlabeled data points.
+%Error is combined across possible labels for each unlabeled data point.
+%Expected error reduction then picks the unlabeled point with the least average (``expected'') error.
+\item[Expected Variance Reduction] Same as expected error reduction, but seeks to reduce variability in outputs rather than error.
+Corresponds to picking designs that lead to greatest reduction in uncertainty about the design space over time.
+\end{description}
+
+%\textit{Entropy} acquisition functions choose designs that are most uncertain according to entropy \cite{settles2012:al-book}.
+%Entropy measures the amount of information needed to encode a distribution.
+%Intuitively, this captures how uncertain a model is about the possible (discrete) outcomes, emphasizing exploration of possibilities.
+%Entropy sampling acts similarly to variance-based sampling for regression.
 
 
 % QBB
 % note: technically a subset of query-by-committee
 % (1) QBC
 % (2) QBB
-\textit{Query-By-Bagging} (QBB) approaches emphasize disagreement among potential models \cite{settles2012:al-book}.
-First, multiple copies of the same objective function are trained using random selections of the playtest data gathered so far.
-This captures the notion of guessing how the model might be if slightly different sets of playtests had occurred.
-Second, these models predict the outcome of new playtests.
-The final choice of design to test is the one these models most disagree on.
-Intuitively, this captures the idea of picking designs that are most likely to be poorly understood.
+%\textit{Query-By-Bagging} (QBB) approaches emphasize disagreement among potential models \cite{settles2012:al-book}.
+%First, multiple copies of the same objective function are trained using random selections of the playtest data gathered so far.
+%This captures the notion of guessing how the model might be if slightly different sets of playtests had occurred.
+%Second, these models predict the outcome of new playtests.
+%The final choice of design to test is the one these models most disagree on.
+%Intuitively, this captures the idea of picking designs that are most likely to be poorly understood.
 
 % QBB vote
 % QBB probability
-Two varieties of QBB are relevant: QBB vote and QBB probability.
-In \textit{QBB vote} each objective function model votes on outcomes, giving a single choice.
-When only two options are possible (e.g. new controls were better or worse than previous) the design with the greatest disagreement between two binary outcomes is chosen.
-When multiple options are possible (e.g. a multi-way branch in a choose-your-own-adventure), the design with the greatest difference between the top two options is chosen.
-%
-In \textit{QBB probability} each objective function model estimates how probable each outcome is, giving a weight to all choices.
-The weights of all models are averaged and the point with lowest probability is chosen. \todo[inline]{find citation}
+%Two varieties of QBB are relevant: QBB vote and QBB probability.
+%In \textit{QBB vote} each objective function model votes on outcomes, giving a single choice.
+%When only two options are possible (e.g. new controls were better or worse than previous) the design with the greatest disagreement between two binary outcomes is chosen.
+%When multiple options are possible (e.g. a multi-way branch in a choose-your-own-adventure), the design with the greatest difference between the top two options is chosen.
+%%
+%In \textit{QBB probability} each objective function model estimates how probable each outcome is, giving a weight to all choices.
+%The weights of all models are averaged and the point with lowest probability is chosen. \todo[inline]{find citation}
 
 % expected error reduction
 % variance reduction
-Expected error reduction and variance reduction attempt to maximize the quality of objective function predictions, rather than reduce variance or disagreement \cite{settles2012:al-book}.
-In \textit{expected error reduction} an unlabeled data point is selected and assigned one of the possible labels.
-This ``fake'' data point is used to train a new objective function model and the error of that model is calculated over all remaining unlabeled data points.
-Error is combined across possible labels for each unlabeled data point.
-Expected error reduction then picks the unlabeled point with the least average (``expected'') error.
-Intuitively, expected error reduction guesses how a new playtest could result and picks the playtest that will most improve the model of how people play.
-%
-\textit{Variance reduction} performs a similar process but minimizes the variance of predictions over data points, rather than the error.
-Intuitively, this picks a playtest most likely to increase certainty about how future playtests will go.
+%Expected error reduction and variance reduction attempt to maximize the quality of objective function predictions, rather than reduce variance or disagreement \cite{settles2012:al-book}.
+%In \textit{expected error reduction} an unlabeled data point is selected and assigned one of the possible labels.
+%This ``fake'' data point is used to train a new objective function model and the error of that model is calculated over all remaining unlabeled data points.
+%Error is combined across possible labels for each unlabeled data point.
+%Expected error reduction then picks the unlabeled point with the least average (``expected'') error.
+%Intuitively, expected error reduction guesses how a new playtest could result and picks the playtest that will most improve the model of how people play.
+%%
+%\textit{Variance reduction} performs a similar process but minimizes the variance of predictions over data points, rather than the error.
+%Intuitively, this picks a playtest most likely to increase certainty about how future playtests will go.
 
 % TODO: KL-divergence or vote entropy?
 
@@ -305,13 +373,15 @@ Intuitively, this picks a playtest most likely to increase certainty about how f
 \begin{figure}[t]
 \centering
 %\includegraphics[width=1\linewidth]{./bullethell_sidebyside}
-\includegraphics[width=1\linewidth]{./bullethell_topbybottom}
+%\includegraphics[width=1\linewidth]{./bullethell_topbybottom}
+\includegraphics[width=1\linewidth]{./bullethell_topbybottom_annotated}
 \caption{Study game interface illustrating player, enemies, and shots fired by both at two points along adaptation process.}
 %Preference learning experiments varied parameters related to player movement; enemy tuning involved the speed, size, and rate of fire of enemy bullets.
 \label{fig:shmup}
 \end{figure}
 
-In order to conduct a case study of machine-driven playtesting we developed a simple shoot-`em-up game (Figure \ref{fig:shmup}).
+We sought to assess the efficacy of AL at reducing the number of playtests needed to achieve a design goal.
+To conduct a case study of machine-driven playtesting we developed a simple shoot-`em-up game (Figure \ref{fig:shmup}).
 Shoot-`em-up games emphasize reflexes and pattern recognition abilities as a player maneuvers a ship to dodge enemy shots and return fire.
 %
 In general, arcade games serve as an ideal starting domain for low-level parameter tuning:
@@ -322,16 +392,16 @@ In general, arcade games serve as an ideal starting domain for low-level paramet
 \item A scoring system makes gameplay goals and progress clear, unlike domains involving puzzle-solving or aesthetic enjoyment of a game world or setting.
 \end{itemize}
 %
-In the case of shoot-`em-up games, we tested two different kinds of game design goals: player game play behavior goals and player subjective response goals.
+In the case of shoot-`em-up games, we tested two different kinds of game design goals: (a) player game play behavior goals and (b) player subjective response goals.
 Player game play behavior goals cover cases where designers seek particular play patterns or outcomes---e.g. player success rates or score achieved. 
 Subjective responses goals cover cases where designers desire specific player subjective feedback---e.g. getting good user ratings on the feel of the controls.
 
 
 % % enemy params
-The shoot-`em-up game is based on space ship combat over a series of waves.
+The shoot-`em-up game involves space ship combat over a series of waves.
 During each wave a series of enemies appear that fire bullets at the player. 
 To test AL for regression we set a game play behavior design goal of the player being hit exactly six times during each wave of enemies and tuned enemy parameters.
-We varied the: size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
+We varied the size of enemy bullets, speed of enemy bullets, and rate that enemies fire bullets. 
 Increasing bullet size requires the player to move more carefully to avoid bullets. 
 Faster bullets require quicker player reflexes to dodge incoming fire. 
 More rapid firing rates increase the volume of incoming fire. 
@@ -361,15 +431,16 @@ Our experiments tested whether AL could reduce the number of human playtests nee
 Random sampling is the standard method used to evaluate the efficacy of AL models for improving model fits for a fixed number of playtests \cite{settles2012:al-book}. 
 This is similar to A/B testing approaches that capture large amounts of data before acting on the results.
 
-In two experiments we used the AL acquisition functions given above for tuning enemy parameters or tuning player controls.
+In two experiments we used the AL acquisition functions given above for regression by tuning enemy parameters and for classification by tuning player controls, respectively.
 Both experiments involved a preliminary test on simulated data followed by testing with human participants.
 The simulation experiments allowed us to verify that our methods would work in principle; humans studies show our method can apply to real-world contexts.
 
 In the regression study we used Gaussian Processes (GPs), the standard non-linear regression function used in the Bayesian experimental design literature.
 Gaussian Processes generally yield good models with few samples (playtests) and computationally inexpensive analytic formulations of many of our acquisition functions.
 In the classification study we used three different objective functions---Gaussian Processes (GP), kernel support vector machines (KSVM), and optimized neural networks (``neuro-evolution'', NE).
-We added KSVMs and NE as GPs are not a common classification approach.
-Kernel methods (particularly KSVMs) are a popular machine learning technique previously used in player modeling \cite{yu2011:minboredom} and optimized neural networks have been widely used in preference learning \cite{yannakakis2011:edpcg}.\footnote{For computational reasons we employ a simple gradient-based optimization method, rather than the more common neuro-evolutionary approaches. 
+KSVMs and NE are common classification approaches, whereas GPs are not.
+%We added KSVMs and NE as GPs are not a common classification approach.
+Kernel methods (particularly KSVMs and GPs) are a popular machine learning technique previously used in player modeling \cite{yu2011:minboredom} and optimized neural networks have been widely used in preference learning \cite{yannakakis2011:edpcg}.\footnote{For computational reasons we employ a simple gradient-based optimization method, rather than the more common neuro-evolutionary approaches. 
 We did not find any performance differences between the two optimization approaches in initial tests in our domain.}
 %All three of these objective functions can be trained in regression or classification modes.
 Note that NE does not produce probabilistic predictions, limiting the acquisition functions it can be paired with.
@@ -422,9 +493,9 @@ We then discuss the results of our tests in detail.
 
 \subsection{Simulation Methods}
 We devised two simple models of how players might respond to different design parameters to verify our AL approach on ground truth information.
-Our regression model treats players as having an underlying set of skills related to each enemy tuning parameter along with a cross-skill rate of making errors.
+Our regression model treats players as having an underlying set of skills related to each enemy tuning parameter along with a cross-skill tolerance for differing challenge demands.
 Greater differences between player skills and enemy parameters lead to larger differences from being hit at a base rate.
-Our classification model treats players as having preferences for each of the control tuning parameters along with a cross-parameter tolerance for differences from preference.
+Our classification model treats players as having preferences for each of the control tuning parameters with a cross-parameter tolerance for differences from preference.
 Preference choices are based on the difference between the ideal set of parameters and design control settings.
 
 
@@ -486,15 +557,15 @@ To perform an empirical evaluation of our methods we deployed two versions of ou
 We publicized the game through websites and local emailing lists and did not offer compensation to participants.
 In order to collect data on patterns of play over time we asked participants to try to play at least 10 waves of the game, though we did not enforce this requirement.
 
-For our analysis we only retained data from players who reached at least 10 waves of play total.
-This subsetting ensures we avoid data from players who were unable to reliably run the game.
+For analysis we only used data from players who reached at least 10 waves of play total.
+This ensures we avoid data from players who were unable to reliably run the game.
 % AZ 2013/10/29 - planning to rerun w/requirement of min 10 waves total, only waves 1-10
 %	AZ 2013/11/27 - done
-For our regression experiment this resulted in data from 138 players and 991 waves of the game total.
+For our regression experiment this resulted in data from 138 players and 991 waves of the game total (using all waves each player played).
 For our preference experiment we had 57 players, 47 of these provided only binary responses of ``better'' or ``worse'' and we limited our analysis to this subset of players.
 % AZ 2013/10/29 - planning to rerun w/requirement of min 10 waves total; should filter some of the people with little data and thus more likely to be spurious results
 %	AZ 2013/11/27 - done
-We retained only preference responses during the first 10 waves of play to avoid collecting many positive responses from those who remain engaged in the game.
+We only used preference responses during the first 10 waves of play to avoid collecting many positive responses from those who remain engaged in the game.
 
 
 % regression: 138 players (currently using max 10 waves verion)
@@ -508,7 +579,7 @@ We retained only preference responses during the first 10 waves of play to avoid
 
 Our AL evaluation used this dataset with the same process as described for the simulation approaches above.
 We trained each objective function to predict preference responses using only the control settings for the most recent wave and the control settings for the previous wave.
-Note that we did not collect preference comparisons after the first wave of the game as players could not yet compare control settings.
+Note that we did not collect preference comparisons for the first wave of the game as players could not yet compare control settings.
 
 For each cross-validation split we constructed a test set of data by randomly selecting a subset of points.
 After this we then randomly sampled to choose the seed data set from only data remaining after removing the test set.
@@ -625,9 +696,9 @@ More playtests marginally improved AL performance.
 In human studies GP-UCB and EI both performed well, other AL methods did not (Figure \ref{fig:reg_all}).
 Variance's lower performance is explained by the tendency to focus on highly uncertain parameter settings---in a high-dimensional space it is easy to find many sets of uncertain bad parameters, leading to poorer performance.
 Over time EI's performance gradually decayed while GP-UCB maintained better performance.
-As more samples are gathered GP-UCB is better able to reduce exploration while EI eventually begins to make poor playtest choices.
+As more samples are gathered GP-UCB reduces exploration while EI eventually begins to make poor playtest choices.
 Approximately 60 samples were needed to train the successful AL methods to their peak performance; random sampling never achieved this level of performance on our data set.
-Overall this is a clear demonstration that AL can enhance playtesting efficacy, perhaps beyond what would happen through simply A/B testing and collecting data.
+Overall this clearly demonstrates AL can enhance playtesting efficacy, perhaps beyond what would happen through simply A/B testing and collecting data.
 
 % summary
 Our regression experiments demonstrate the power of AL to reduce the amount of playtesting required.
@@ -636,11 +707,11 @@ These results make a strong case for AL applied to optimizing low-level in-game 
 
 
 \subsection{Classification}
-Our classification experiments show AL can produce useful results with few samples, but is generally more challenging in subjective domains.
-In simulation data AL methods always yielded improvements over random sampling.
+Our classification experiments show AL can reduce testing needs when using few samples, but that subjective classification is generally more challenging.
+In simulation data AL methods almost always yielded improvements over random sampling.
 On human human data QBB methods improved GP and KSVM performance with few samples; all methods (including random sampling) were comparable with more samples.
 These results suggest AL has benefits in preference choices when data is sparse, but less value when more data is available.
-It is also possible players differ enough in preferred controls to prevent good model learning across all players.
+Players may differ enough in preferred controls to prevent learning a good model across all players.
 
 % sim: 
 %	random: NE > GP > KSVM
@@ -656,10 +727,10 @@ It is also possible players differ enough in preferred controls to prevent good 
 \hline
 \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{80 samples}                 & \multicolumn{3}{|c|}{280 samples}                \\ \cline{2-7} 
 \multicolumn{1}{|l|}{}                                                          & GP             & KSVM           & NE             & GP             & KSVM           & NE             \\ \hline
-random                                                                          & 0.738          & 0.722          & 0.736          & 0.807          & 0.798          & 0.893          \\ \hline
-entropy                                                                         & 0.759          & 0.705          & -              & \textbf{0.843} & 0.821          & -              \\ \hline
-QBB vote                                                                        & \textbf{0.788} & \textbf{0.744} & \textbf{0.749} & 0.815          & \textbf{0.829} & \textbf{0.963} \\ \hline
-QBB prob                                                                        & 0.680          & 0.676          & -              & 0.839          & 0.804          & -              \\ \hline
+random                                                                          & 0.720          & 0.719          & 0.733          & 0.807          & 0.800          & 0.892          \\ \hline
+entropy                                                                         & \textbf{0.776} & 0.670          & N/A            & \textbf{0.844} & \textbf{0.821} & N/A              \\ \hline
+QBB vote                                                                        & \textbf{0.788} & \textbf{0.727} & \textbf{0.741} & 0.817          & \textbf{0.829} & \textbf{0.965} \\ \hline
+QBB prob                                                                        & 0.663          & 0.659          & N/A            & \textbf{0.838} & 0.810          & N/A              \\ \hline
 \end{tabular}
 %
 % % non-scriptsize
@@ -695,7 +766,7 @@ QBB prob                                                                        
     % QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
     % NE most effective; esp QBB vote
     % NE random outdoes others
-In simulation QBB vote and entropy sampling showed strong performance gains across all three objective functions (Figure \ref{fig:cls_all}, Table \ref{tab:cls_sim}).
+In simulation QBB vote and entropy showed strong performance gains across all three objective functions (Figure \ref{fig:cls_all}, Table \ref{tab:cls_sim}).
 Previous work has found QBB models are best for high variance data sets \cite{schein2007:al-logreg-eval}.
 Entropy sampling is also effective for high-variance situations.
 The complexity of our simulation model made it a highly variable function to optimize and demonstrates the value of AL methods that can handle these situations.
@@ -710,11 +781,11 @@ Among objective functions NE showed the best performance; GPs had strong early p
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
 \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{80 samples} & \multicolumn{3}{|c|}{280 samples}       \\ \cline{2-7} 
-\multicolumn{1}{|l|}{}                                                          & GP        & KSVM      & NE       & GP             & KSVM           & NE    \\ \hline
-random                                                                          & 0.713     & 0.653     & 0.679    & 0.758          & 0.749          & 0.744 \\ \hline
-entropy                                                                         & 0.713     & 0.689     & -        & 0.763          & 0.753          & -     \\ \hline
-QBB vote                                                                        & 0.714     & 0.699     & 0.698    & \textbf{0.778} & \textbf{0.786} & 0.777 \\ \hline
-QBB prob                                                                        & 0.711     & 0.704     & -        & \textbf{0.779} & \textbf{0.792} & -     \\ \hline
+\multicolumn{1}{|l|}{}                                                          & GP                 & KSVM              & NE       & GP             & KSVM           & NE    \\ \hline
+random                                                                          & 0.585              & 0.518             & 0.572    & 0.677          & 0.639          & 0.635 \\ \hline
+entropy                                                                         & 0.586              & 0.553             & N/A      & 0.652          & 0.693          & N/A     \\ \hline
+QBB vote                                                                        & \textbf{0.622}     & \textbf{0.601}    & 0.568    & 0.656          & 0.637          & 0.659 \\ \hline
+QBB prob                                                                        & \textbf{0.635}     & 0.529             & N/A      & 0.662          & 0.657          & N/A     \\ \hline
 \end{tabular}
 %
 % % non-scriptsize version
@@ -740,12 +811,12 @@ In human studies only GPs (with QBB vote or probability) and KSVMs (with QBB vot
 These results suggest AL is able to mitigate high variability when possible but using a greater portion of the total data forces additional noise that cannot be mitigated.
 When using random sampling GPs performed best, followed by NE and then KSVMs.
 As GPs are designed for smaller sample sizes these results are not surprising.
-The comparatively poor performance of NE in this setting suggests the model was overfitting simulation data and unable to accommodate the noise in human results.
+The relatively poor performance of NE here suggests the model was overfitting simulation data and unable to accommodate the noise in human results.
 
 
 % summary
 Our classification experiments thus demonstrate AL can reduce the amount of playtesting needed even for subjective features of a design such as control settings.
-Reducing playtest costs, however, requires acquisition functions (e.g. entropy sampling or QBB) that mitigate the high variance inherent in preference response data.
+Reducing playtest costs, however, requires acquisition functions (e.g. QBB or entropy) that mitigate the high variance inherent in preference response data.
 Exploring methods that learn multiple possible distinct control settings is a promising direction for future work.
 
 
@@ -760,7 +831,11 @@ Exploring methods that learn multiple possible distinct control settings is a pr
 
 % % future: optimal experimental design (rafferty, chaloner); hcomp for more direct human participation
 
-
+We have shown how low-level design parameter tuning playtesting can be automated.
+Using AL techniques can reduce the expense of playtesting in terms of the number of input points (designs) tested.
+Machine-driven playtesting can thus complement the strengths of human game designers by allowing them to focus on high-level design goals.
+Machine-driven playtesting has great promise for broadening how automation enhances existing game design practices across the design iteration process.
+In the future we hope to see automated techniques for other aspects of design like recognizing design flaws or assigning credit to aspects of a design for a variety of player behavioral and subjective outcomes.
 
 
 
