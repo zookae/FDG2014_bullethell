@@ -535,18 +535,18 @@ We discarded ratings that were not in these two classes as human data had too fe
 
 In each cross-validation fold we generated a set of 30 initial randomly sampled design parameter settings and used the simulated models to generate playtester responses.
 These settings and responses formed the initial training data set.
-An additional set of 100 testing points was generated in the same way.
+An additional set of 500 testing points was generated in the same way.
 We then created the grid of points the AL model could sample, forming the training pool.
-Finally, we created a set of 100 randomly sampled design parameters and 
 Within each fold we then repeated the following process:
 \begin{enumerate}
 \item Train the objective function on the training data set.
 \item Test the objective function on the testing data set and measure the error.
 \item Use the acquisition function to pick a point from the training pool to improve the objective function model.
 \item Generate a player response for that training pool point and remove it from the training pool.
-\item Return to the first step and repeat the process.
+\item Return to the first step and repeat the process until the maximum number of training points is used.
 \end{enumerate}
-\noindent For regression we measured error as the mean squared error from the desired rate of being hit.
+\noindent We used a maximum of 300 training points in both regression and classification.\footnote{For computational reasons we only used a maximum of 200 points for error reduction and variance reduction and 280 NE methods in classification.}
+For regression we measured error as the mean squared error from the desired rate of being hit.
 For classification we measured error as the F1 score---a combination of model accuracy and coverage of sample data.
 
 
@@ -623,21 +623,6 @@ UCB                                                                             
 \label{tab:reg_res}
 \end{table}
 
-%\begin{table}[tb]
-%\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of simulated data (units $10^{-2}$).}
-%\centering
-%\begin{tabular}{|c|c|c|}
-%\hline
-%\textbf{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \textbf{MSE 80 samples} & \textbf{MSE 280 samples} \\ \hline
-%random                                                                  & 1.91                    & 1.36                     \\ \hline
-%variance                                                                & 1.50                    & 1.39                     \\ \hline
-%PI                                                                      & 8.32                    & 6.38                     \\ \hline
-%EI                                                                      & 1.60                    & 1.30                     \\ \hline
-%UCB                                                                     & 1.48                    & 1.38                     \\ \hline
-%\end{tabular}
-%\label{tab:reg_sim}
-%\end{table}
-
 
 \begin{figure}[tb]
 \centering
@@ -646,53 +631,24 @@ UCB                                                                             
 \label{fig:reg_all}
 \end{figure}
 
-% simulation
-%\begin{figure}[tbph]
-%\centering
-%\includegraphics[width=\linewidth]{regression_simulation}
-%\caption{Regression simulation mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
-%\label{fig:reg_sim}
-%\end{figure}
 
 %    all 3 methods do quite well
 %    EI asmpytotes to slightly better results
 In simulation all AL methods performed well except for PI (not shown as it distorts the graph scale) (Figure \ref{fig:reg_all}).
 As PI is a pure exploitation strategy it focuses on playtesting parameter settings that are highly certain.
 Because we are tuning three parameters in a fine-grained space this makes it easy to find many bad parameters and fail to distinguish among many possible alternatives.
-%
-% TODO: PI might be bugged
-%
 Roughly 50-60 playtests were needed to tune the three parameters related to player performance against enemies when using GP-UCB, EI, or variance; random sampling required 175 playtests for comparable performance.
 More playtests marginally improved AL performance.
 
-%\begin{table}[tb]
-%\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) playtest samples of human data.}
-%\centering
-%\begin{tabular}{|c|c|c|}
-%\hline
-%\textbf{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \textbf{MSE 80 samples} & \textbf{MSE 280 samples} \\ \hline
-%random                                                                  & 136                     & 124                      \\ \hline
-%variance                                                                & 121                     & 120                      \\ \hline
-%PI                                                                      & 133                     & 123                      \\ \hline
-%EI                                                                      & 112                     & 127                      \\ \hline
-%UCB                                                                     & 107                     & 117                      \\ \hline
-%\end{tabular}
-%\label{tab:reg_expr}
-%\end{table}
 
-% human
-%\begin{figure}[tbph]
-%\centering
-%\includegraphics[width=\linewidth]{regression_experiment}
-%\caption{Regression human study mean squared error vs number of samples used in training for different objective and acquisition function combinations. Decreasing values indicates increasing performance.}
-%\label{fig:reg_expr}
-%\end{figure}
-    % UCB and EI are only ones to do well
-    % -- UCB remains at consistently high performance
-    % -- EI gradually gets worse over time
-    % why?
-    % -- variance and PI do not capture exploration and thus have difficulty finding good results
-    % -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
+
+%% human
+% UCB and EI are only ones to do well
+% -- UCB remains at consistently high performance
+% -- EI gradually gets worse over time
+% why?
+% -- variance and PI do not capture exploration and thus have difficulty finding good results
+% -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
 In human studies GP-UCB and EI both performed well, other AL methods did not (Figure \ref{fig:reg_all}).
 Variance's lower performance is explained by the tendency to focus on highly uncertain parameter settings---in a high-dimensional space it is easy to find many sets of uncertain bad parameters, leading to poorer performance.
 Over time EI's performance gradually decayed while GP-UCB maintained better performance.
@@ -707,11 +663,11 @@ These results make a strong case for AL applied to optimizing low-level in-game 
 
 
 \subsection{Classification}
-Our classification experiments show AL can reduce testing needs when using few samples, but that subjective classification is generally more challenging.
-In simulation data AL methods almost always yielded improvements over random sampling.
-On human human data QBB methods improved GP and KSVM performance with few samples; all methods (including random sampling) were comparable with more samples.
-These results suggest AL has benefits in preference choices when data is sparse, but less value when more data is available.
-Players may differ enough in preferred controls to prevent learning a good model across all players.
+Our classification experiments show AL reduce testing needs by reducing variance in predictions.
+% but that subjective classification is generally more challenging.
+In simulation data variance-reducing methods---entropy and QBB vote---yielded improvements over random sampling.
+On human data similar methods were effective, often yielding larger performance improvements than in simulation.
+These results suggest AL methods are effective even with more complex data and can improve a variety of objective functions.
 
 % sim: 
 %	random: NE > GP > KSVM
@@ -720,7 +676,7 @@ Players may differ enough in preferred controls to prevent learning a good model
 
 \begin{table}[tb]
 \centering
-\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) simulated playtest samples.}
+\caption{Comparison of acquisition-objective function combination accuracy with few (100) and many (200) simulated playtest samples.}
 % % scriptsize version
 \scriptsize
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -736,16 +692,16 @@ var red                                                                         
 \end{tabular}
 
 % table of improvements
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{100 samples} & \multicolumn{3}{|c|}{200 samples}                \\ \cline{2-7} 
-\multicolumn{1}{|l|}{}                                                          & GP              & KSVM    & NE    & GP             & KSVM           & NE             \\ \hline
-entropy                                                                         & \textbf{0.059}  & -0.021  & N/A   & \textbf{0.033} & \textbf{0.014} & N/A            \\ \hline
-QBB vote                                                                        & \textbf{0.058}  & -0.001  & 0.014 & 0.024          & \textbf{0.015} & \textbf{0.061} \\ \hline
-QBB prob                                                                        & -0.041          & -0.047  & N/A   & \textbf{0.031} & -0.024         & N/A            \\ \hline
-error red                                                                       & -0.041          & -0.011  & N/A   & -0.009         & -0.015         & N/A            \\ \hline
-var red                                                                         & -0.015          & -0.019  & N/A   & 0.003          & -0.019         & N/A            \\ \hline
-\end{tabular}
+%\begin{tabular}{|c|c|c|c|c|c|c|}
+%\hline
+%\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{100 samples} & \multicolumn{3}{|c|}{200 samples}                \\ \cline{2-7} 
+%\multicolumn{1}{|l|}{}                                                          & GP              & KSVM    & NE    & GP             & KSVM           & NE             \\ \hline
+%entropy                                                                         & \textbf{0.059}  & -0.021  & N/A   & \textbf{0.033} & \textbf{0.014} & N/A            \\ \hline
+%QBB vote                                                                        & \textbf{0.058}  & -0.001  & 0.014 & 0.024          & \textbf{0.015} & \textbf{0.061} \\ \hline
+%QBB prob                                                                        & -0.041          & -0.047  & N/A   & \textbf{0.031} & -0.024         & N/A            \\ \hline
+%error red                                                                       & -0.041          & -0.011  & N/A   & -0.009         & -0.015         & N/A            \\ \hline
+%var red                                                                         & -0.015          & -0.019  & N/A   & 0.003          & -0.019         & N/A            \\ \hline
+%\end{tabular}
 %
 % % non-scriptsize
 %\begin{tabular}{|c|c|c|c|c|c|c|}
@@ -768,19 +724,13 @@ var red                                                                         
 \end{figure}
 
 
-% simulation
-%\begin{figure}[tbph]
-%\centering
-%\includegraphics[width=\linewidth]{classification_simulation}
-%\caption{Classification simulation F1 score vs number of samples used in training for different objective and acquisition function combinations. Increasing values indicates increasing performance.}
-%\label{fig:cls_sim}
-%\end{figure}
-    % GP random beats KSVM random -> GP is better able to model domain
-    % GP entropy shows best trend -> focus on finding out where problems are
-    % QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
-    % NE most effective; esp QBB vote
-    % NE random outdoes others
-In simulation QBB vote and entropy showed strong performance gains across all three objective functions (Figure \ref{fig:cls_all}, Table \ref{tab:cls_sim}).
+%% simulation
+% GP random beats KSVM random -> GP is better able to model domain
+% GP entropy shows best trend -> focus on finding out where problems are
+% QBB models do moderately, but expensive to train -> best for high variance situations and model was not too high variance [cf Schein logreg]
+% NE most effective; esp QBB vote
+% NE random outdoes others
+In simulation entropy and QBB vote showed strong performance gains across all three objective functions (Figure \ref{fig:cls_all}, Table \ref{tab:cls_sim}).
 Previous work has found QBB models are best for high variance data sets \cite{schein2007:al-logreg-eval}.
 Entropy sampling is also effective for high-variance situations.
 The complexity of our simulation model made it a highly variable function to optimize and demonstrates the value of AL methods that can handle these situations.
@@ -789,7 +739,7 @@ Among objective functions NE showed the best performance; GPs had strong early p
 
 \begin{table}[tb]
 \centering
-\caption{Comparison of acquisition-objective function combination accuracy with few (80) and many (280) human playtest samples.}
+\caption{Comparison of acquisition-objective function combination accuracy with few (100) and many (200) human playtest samples.}
 % % scriptsize version
 \scriptsize
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -805,16 +755,16 @@ var red                                                                         
 \end{tabular}
 
 % table of improvements
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{100 samples}                & \multicolumn{3}{|c|}{200 samples}                \\ \cline{2-7} 
-\multicolumn{1}{|l|}{}                                                          & GP             & KSVM           & NE             & GP             & KSVM           & NE             \\ \hline
-entropy                                                                         & \textbf{0.043} & \textbf{0.046} & N/A            & -0.010         & 0.042          & N/A            \\ \hline
-QBB vote                                                                        & \textbf{0.038} & \textbf{0.062} & \textbf{0.030} & 0.007          & 0.068          & \textbf{0.042} \\ \hline
-QBB prob                                                                        & 0.029          & 0.040          & N/A            & \textbf{0.019} & \textbf{0.074} & N/A            \\ \hline
-error red                                                                       & \textbf{0.041} & 0.018          & N/A            & \textbf{0.023} & \textbf{0.065} & N/A            \\ \hline
-var red                                                                         & -0.060         & -0.017         & N/A            & -0.046         & 0.016          & N/A            \\ \hline
-\end{tabular}
+%\begin{tabular}{|c|c|c|c|c|c|c|}
+%\hline
+%\multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}} & \multicolumn{3}{|c|}{100 samples}                & \multicolumn{3}{|c|}{200 samples}                \\ \cline{2-7} 
+%\multicolumn{1}{|l|}{}                                                          & GP             & KSVM           & NE             & GP             & KSVM           & NE             \\ \hline
+%entropy                                                                         & \textbf{0.043} & \textbf{0.046} & N/A            & -0.010         & 0.042          & N/A            \\ \hline
+%QBB vote                                                                        & \textbf{0.038} & \textbf{0.062} & \textbf{0.030} & 0.007          & 0.068          & \textbf{0.042} \\ \hline
+%QBB prob                                                                        & 0.029          & 0.040          & N/A            & \textbf{0.019} & \textbf{0.074} & N/A            \\ \hline
+%error red                                                                       & \textbf{0.041} & 0.018          & N/A            & \textbf{0.023} & \textbf{0.065} & N/A            \\ \hline
+%var red                                                                         & -0.060         & -0.017         & N/A            & -0.046         & 0.016          & N/A            \\ \hline
+%\end{tabular}
 
 %
 % % non-scriptsize version
@@ -836,16 +786,17 @@ var red                                                                         
 %		GP: QBB prob +vote wins w/few samples, loses/ties at more
 %		NE: no difference
 %		KSVM: QBB vote early improvement
-In human studies only GPs (with QBB vote or probability) and KSVMs (with QBB vote) improved over random sampling and only with few samples (Table \ref{tab:cls_expr}).
-These results suggest AL is able to mitigate high variability when possible but using a greater portion of the total data forces additional noise that cannot be mitigated.
+In human studies entropy, QBB vote and probability, and error reduction all showed improvements over random sampling (Table \ref{tab:cls_expr}).
+QBB methods (especially vote) were effective at both few and many samples.
+Entropy was only effective with few samples while error reduction was most effective with more samples.
+Error reduction depends on predicting future outcomes and thus requires more initial data before becoming effective.
 When using random sampling GPs performed best, followed by NE and then KSVMs.
-As GPs are designed for smaller sample sizes these results are not surprising.
-The relatively poor performance of NE here suggests the model was overfitting simulation data and unable to accommodate the noise in human results.
+Using AL methods provided the largest performance boost for KSVMs, though GPs and NE also benefited.
 
 
 % summary
 Our classification experiments thus demonstrate AL can reduce the amount of playtesting needed even for subjective features of a design such as control settings.
-Reducing playtest costs, however, requires acquisition functions (e.g. QBB or entropy) that mitigate the high variance inherent in preference response data.
+Reducing playtest costs requires acquisition functions (e.g. QBB or entropy) that mitigate the high variance inherent in preference response data.
 Exploring methods that learn multiple possible distinct control settings is a promising direction for future work.
 
 
