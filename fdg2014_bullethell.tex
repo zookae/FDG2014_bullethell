@@ -221,7 +221,7 @@ For classification models we cover the most common frameworks for AL with discre
 Acquisition functions choose which input parameters to test next to most efficiently maximize an objective function.
 Acquisition functions vary along a spectrum of exploration---playtesting by picking designs that are least understood---and exploitation---picking designs that are expected to be best.
 We consider four acquisition functions for regression models: (1) variance, (2) probability of improvement, (3) expected improvement, and (4) upper-confidence bounds.
-These acquisition functions have been developed in the field of Bayesian experimental design and apply generally to any regression model with a probabilistic interpretation \cite{chaloner1995, brochu2010:thesis}.
+These acquisition functions have been developed in the field of Bayesian experimental design and apply generally to any regression model with a probabilistic interpretation \cite{brochu2010:thesis, chaloner1995}.
 Regression models are useful when design goals fall along a continuous scale; we examine player behavior, specifically studying performance as damage taken.
 
 
@@ -510,8 +510,21 @@ Both methods explicitly balance exploring and exploiting potential test designs,
 
 % http://www.tablesgenerator.com/
 
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\linewidth]{regression_experiment}
+\caption{GP performance improvement over random sampling when using different acquisition functions.
+Shows reduction in MSE with an increasing pool of AL-selected training samples.
+Larger values indicate better performance.
+Bands indicate values that were averaged to produce Table \ref{tab:reg_res}.
+}
+\label{fig:reg_all}
+\end{figure}
+
 \begin{table}[tb]
-\caption{Comparison of GP mean squared error with various acquisition functions. Lower values indicate better performance.}
+\caption{Comparison of GP MSE with various acquisition functions. 
+Sample sizes indicate values averaged over a range of $\pm$5 samples (for smoothing).
+Lower values indicate better performance.}
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -536,14 +549,7 @@ UCB                                                           & \textbf{107} & \
 \end{table}
 
 
-\begin{figure}[tb]
-\centering
-\includegraphics[width=\linewidth]{regression_results}
-\caption{Regression experiments GP mean squared error on predicting number of times player is hit vs number of samples used in training for different acquisition functions. Lower values indicate better performance. Top figure uses simulation data, bottom uses human data. Lines demarcate points used in Table \ref{tab:reg_res}.}
-\label{fig:reg_all}
-\end{figure}
 
-\todo[inline]{get figure w/relative improvements}
 
 %% human
 % UCB and EI are only ones to do well
@@ -552,12 +558,13 @@ UCB                                                           & \textbf{107} & \
 % why?
 % -- variance and PI do not capture exploration and thus have difficulty finding good results
 % -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
-Methods that balance exploration and exploitation---UCB and EI---performed well, other AL methods did not (Figure \ref{fig:reg_all}).
-Variance only performed well with many samples; explained by the need to explore heavily before having a good enough design model.
+Methods that balance exploration and exploitation---UCB and EI---performed well, other AL methods did not.
+Figure \ref{fig:reg_all} shows how much different acquisition functions reduced MSE compared to a baseline random sampling approach; Table \ref{tab:reg_res} shows raw MSE values.
+Variance performed relatively better with many samples, explained by the need to explore heavily before having a good enough design model.
 When tuning many parameters at once it is easy to find many sets of uncertain (but bad) parameters, leading to poor performance with few samples.
-Over time EI gradually worsened while UCB maintained better performance.
+Over time EI gradually worsened while UCB and variance maintained better performance.
 As more samples are gathered UCB reduces exploration while EI eventually begins to make poor playtest choices.
-Approximately 100 samples were needed to train the successful AL methods to their peak performance; random sampling never achieved this level of performance on our data set.
+Approximately 70 samples were needed to train the successful AL methods for the biggest peak performance improvements; random sampling never achieved this level of performance on our data set (Table \ref{tab:reg_res}).
 Overall this clearly demonstrates AL can enhance playtesting efficacy, perhaps beyond what would happen through simply A/B testing and collecting data.
 
 % summary
@@ -568,23 +575,29 @@ These results make a strong case for AL applied to optimizing low-level in-game 
 
 \subsection{Classification}
 Our classification experiments show AL improves models of subjective player preferences with both probabilistic and non-probabilistic acquisition functions.
-Methods that tolerate high variance---entropy, QBB vote and probability, and expected error reduction---have the strongest performance (Table \ref{tab:cls_expr}).
+Methods that tolerate high variance---entropy, QBB vote and probability, and expected error reduction---have the strongest performance (Table \ref{tab:cls_res}).
 These acquisition functions succeed by overcoming the noise inherent in human playtest data, particularly when using few playtests.
-Our results show AL methods are effective even with more complex data and can improve a variety of baseline design models (GPs, KSVMs, and NE).
+Our results show AL methods are effective even with more complex data and can improve a variety of baseline classification design models (called classifiers---GPs, KSVMs, and NE).
 
 
-\todo[inline]{replace}
-\begin{figure}[tbph]
+\begin{figure}[tb]
 \centering
-\includegraphics[width=\linewidth]{classification_results}
-\caption{Classification F1 score vs number of samples used in training for different objective and acquisition function combinations. Higher values indicate better performance. Top figure uses simulation data, bottom uses human data.}
+\includegraphics[width=\linewidth]{classification_experiment}
+\caption{Classification performance improvement over random sampling with different combinations of classifiers and acquisition functions.
+Higher values indicate better performance.
+Shows improvement in F1 score with an increasing pool of AL-selected training samples.
+Bands indicate values that were averaged to produce Table \ref{tab:cls_res}.
+Only the best-performing acquisition functions for each classifier are shown for clarity.
+}
 \label{fig:cls_all}
 \end{figure}
 
 
 \begin{table}[tb]
 \centering
-\caption{Comparison of acquisition-objective function combination accuracy with few (100) and many (200) playtest samples.}
+\caption{Comparison of acquisition-objective function F1 scores.
+Sample sizes indicate values averaged over a range of $\pm$5 samples (for smoothing).
+Higher values indicate better performance.}
 % % scriptsize version
 \scriptsize
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -622,7 +635,7 @@ var red                                                                         
 %QBB vote                                                                        & 0.71      & 0.70      & 0.70     & 0.78      & 0.79      & 0.78      \\ \hline
 %QBB prob                                                                        & 0.71      & 0.70      & 0.68     & 0.78      & 0.79      & 0.74      \\ \hline
 %\end{tabular}
-\label{tab:cls_expr}
+\label{tab:cls_res}
 \end{table}
 
 % human:
@@ -631,7 +644,8 @@ var red                                                                         
 %		GP: QBB prob +vote wins w/few samples, loses/ties at more
 %		NE: no difference
 %		KSVM: QBB vote early improvement
-Entropy, QBB vote and probability, and error reduction all improved classification quality (as F1 score) over random sampling (Figure \ref{fig:cls_all}).
+Entropy, QBB vote and probability, and error reduction all improved classification quality (as F1 score) over random sampling.
+Figure \ref{fig:cls_all} shows the amount of performance improvement for the best-improving acquisition functions for each classifier; Table \ref{tab:cls_res} shows the raw F1 scores.
 QBB methods (especially vote) were effective at both few and many samples.
 Entropy was only effective with few samples while error reduction was most effective with more samples.
 Expected error reduction depends on predicting future outcomes and thus requires more initial data before becoming effective.
