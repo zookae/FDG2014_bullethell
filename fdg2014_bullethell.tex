@@ -1,12 +1,12 @@
 \documentclass{sig-alternate}
 
-\usepackage{todonotes}
-\usepackage{hyperref}
+%\usepackage{todonotes}
+%\usepackage{hyperref}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{tabularx}
-\usepackage{booktabs}
+%\usepackage{booktabs}
 \newcommand{\mytodo}[1]{\textbf{[[#1]]}}
 
 \begin{document}
@@ -63,10 +63,6 @@ This work opens the potential for additional methods to reduce the human burden 
 
 %\todo[inline]{update top part w/FDG info} % TODO!
 
-\todo[inline]{new ACM classifications are weird, this was best I had for ``category''.
-other options:
-Software and its engineering; Virtual worlds software; Interactive Games
-or something about management/operations...}
 
 % motivation
 Iterative game design practices emphasize the centrality of playtesting to improve and refine a game's design.
@@ -568,7 +564,7 @@ Larger values indicate better performance.
 \end{figure}
 
 \begin{table}[tb]
-\caption{Comparison of GP MSE with various acquisition functions. 
+\caption{Regression GP MSE acquisition function comparison.
 Sample sizes indicate values averaged over a range of $\pm$5 samples (for smoothing).
 Lower values indicate better performance.}
 \centering
@@ -645,7 +641,7 @@ Higher values indicate better performance.
 Shows F1 score with an increasing pool of AL-selected training samples.
 Bands indicate values that were averaged to produce Table \ref{tab:cls_res}.
 Only the best-performing acquisition functions for each classifier are shown for clarity.
-The only random sampling shown is using a GP as this had the best performance.
+%The only random sampling shown is using a GP as this had the best performance.
 }
 \label{fig:cls_happy}
 \end{figure}
@@ -655,7 +651,7 @@ The only random sampling shown is using a GP as this had the best performance.
 \includegraphics[width=\linewidth]{classification_experiment}
 \caption{Classification performance improvement over random sampling with different combinations of classifiers and acquisition functions.
 Higher values indicate better performance.
-Shows improvement in F1 score with an increasing pool of AL-selected training samples.
+Shows gains in F1 score with an increasing pool of AL-selected training samples.
 Only the best-performing acquisition functions for each classifier are shown for clarity.
 }
 \label{fig:cls_all}
@@ -664,7 +660,7 @@ Only the best-performing acquisition functions for each classifier are shown for
 
 \begin{table}[tbp]
 \centering
-\caption{Comparison of acquisition-objective function F1 scores.
+\caption{Classification acquisition-objective function F1 score comparison.
 Sample sizes indicate values averaged over a range of $\pm$5 samples (for smoothing).
 Higher values indicate better performance.}
 % % scriptsize version
