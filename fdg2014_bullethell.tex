@@ -473,7 +473,7 @@ We discarded ratings that were not in these two classes as our data had too few 
 
 For each cross-validation fold we first set aside a randomly selected 10\% of the data for evaluating objective function performance.
 %randomly selected 300 data points to use for cross-validation; the remaining data was used as .
-Next we randomly sampled 30 inputs and outputs from the other 90\% of the data set to create a training data set; the remaining data set samples formed the training pool.
+Next we randomly sampled 30 inputs and outputs from the other 90\% of the data set to create a training data set; the remaining unused samples formed the training pool.
 %An additional set of 500 testing points was generated in the same way.
 %We then created the grid of points the AL model could sample, forming the training pool.
 Within each fold we then repeated the following process:
@@ -501,7 +501,7 @@ Within each fold we then repeated the following process:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Results}
+\section{Results and Discussion}
 
 Overall our results show AL is a promising approach for reducing the number of playtests needed to achieve a design goal.
 %In regression and classification studies AL was able to reduce the number of playtests using multiple different acquisition functions.
@@ -514,9 +514,9 @@ Below we provide further details with an emphasis on how AL impacted the need fo
 
 \subsection{Regression}
 
-Our regression experiments show strong results for AL to design for players having a desired level of performance for almost all acquisition functions.
+Our regression experiments show strong results for AL to tune for players having a desired level of performance for almost all acquisition functions.
 Having a clear behavioral objective (being hit a number of times in the game) was likely a strong contributor.
-We found UCB and EI to be most effective (Table \ref{tab:reg_res}).
+We found UCB and EI were most effective (Table \ref{tab:reg_res}).
 Both methods explicitly balance exploring and exploiting potential test designs, suggesting parameter tuning objectives involve a balance between considering alternative parameter settings and refining a given setting.
 
 
@@ -620,9 +620,10 @@ These figures illustrate AL can provide substantial gains with few samples and m
 
 QBB methods (especially vote) were effective at both few and many samples.
 Entropy was only effective with few samples while error reduction was most effective with more samples.
-Expected error reduction depends on predicting future outcomes and thus requires more initial data before becoming effective.
-Variance reduction had poor performance; similarly to the variance acquisition function for regression a large number of possible parameters causes difficulty in effectively reducing variability in responses.
-We speculate that preference responses are typically noisy due to people shifting preferences or disagreeing on a common design as preferable (e.g. looking control sensitivity or inversion in first-person games).
+Expected error reduction must predict future outcomes and thus requires more initial data before becoming effective.
+Variance reduction had poor performance.
+As with the variance acquisition function for regression a large number of possible parameters causes difficulty in effectively reducing variability in responses.
+We speculate preference responses are typically noisy due to people shifting preferences or disagreeing on a common design as preferable (e.g. look control sensitivity or inversion in first-person games).
 
 % base model comparison
 Comparing the design models, we found GPs had the best performance with random sampling, followed by NE and then KSVMs.
@@ -707,7 +708,15 @@ var red                                                                         
 \end{table}
 
 
+\subsection{Limitations}
 
+Our work has several limitations that point to important avenues for further developing machine--driven playtesting.
+We used a game domain that allows for a tight loop between playing the game and evaluating the game parameters.
+More complex design tasks such as playtesting a platformer level or tuning a simulation game system will likely require more sophisticated techniques for credit assignment to design elements.
+Our tasks tuned a set of flat parameters.
+Tasks with structured design elements---e.g. rule sets in a card or board game---will require alternative techniques able to handle modular composition of design parameters in the optimization process.
+Understanding the relative strengths and weaknesses of different AL approaches for different game types and design tasks is a rich area for further research.
+This paper presents a first step toward understanding how machines can support game design across these applications.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -723,34 +732,25 @@ var red                                                                         
 % value: show designers how best to playtest!
 
 We have shown how playtesting for low-level design parameter tuning can be automated using active learning.
-AL can reduce the expense of playtesting to achieve a design goal by intelligently picking designs to test.
+AL can reduce the cost of playtesting to achieve a design goal by intelligently picking designs to test.
 In some cases AL may get better results for a design goal than simple A/B testing could accomplish.
-machine--driven playtesting can thus complement the strengths of human game designers by allowing them to focus on high-level design goals while machines handle mundane parameter tweaking.
-Using AL is especially powerful when coupled to online playtesting, enabling a machine to simultaneously optimize many parameters without burdening the designer.
+AL is especially powerful when coupled to online playtesting, enabling a machine to simultaneously optimize many parameters without burdening the designer.
 %machine--driven playtesting has great promise for broadening how automation enhances existing game design practices across the design iteration process.
 
-To the best of our knowledge this paper is novel in automatically tuning game controls.%, specifically meeting player preferences.
+To the best of our knowledge this paper is novel in automatically tuning game controls. %, specifically meeting player preferences.
 Application of machine learning and AI to games have focused on content generation rather than player \textit{interaction}.
 Interaction ``feel'' is crucial to many digital games---poor controls can obstruct player enjoyment or make a game unplayable.
 This work provides a first step to addressing this problem through tuning controls to construct a single control setting that best meets the preferences of many players.
 
-
-\todo[inline]{not sure where best to mention limitations}
-Our work has several limitations that point to important avenues for further developing machine--driven playtesting.
-We used a game domain that allows for a tight loop between playing the game and evaluating the game parameters.
-More complex design tasks such as playtesting a platformer level or tuning a simulation game system will likely require more sophisticated techniques for credit assignment to design elements.
-Our tasks tuned a set of flat parameters.
-Tasks with structured design elements---e.g. rule sets in a card or board game---will require alternative techniques able to handle modular composition of design parameters in the optimization process.
-Understanding the relative strengths and weaknesses of different AL approaches for different game types and design tasks is a rich area for further research.
-This paper presents a first step toward understanding how machines can support game design across these applications.
-
-\todo[inline]{this may be out of place or useless...}
-We believe machine--driven playtesting may provide insights into how to best perform playtests.
-Designers may be able to learn better playtest techniques through considering how machines best achieve these tasks.
-For example, in AL for regression we found the UCB acquisition function was best.
-UCB uses a process of initially exploring widely before shifting toward greater exploitation; UCB chooses designs expected to elicit both high-quality and high-variability results to narrow the space of alternatives.
+We believe machine--driven playtesting can provide insights into how to best perform playtests.
+Designers might learn better playtest techniques by considering how machines best perform these tasks.
+For example, UCB was the best acquisition function for AL in regression.
+UCB uses a process of initially exploring widely before shifting toward greater exploitation by choosing designs expected to elicit both high-quality and high-variability results to narrow the space of alternatives.
 Balance or other feature--tuning techniques may benefit from similar methods of parallel tests on multiple alternatives based on balanced consideration of their value and how well they are understood.
-In the future we hope to see automated techniques for other aspects of design---recognizing design flaws or assigning credit to aspects of a design---for a variety of player behavioral and subjective outcomes.
+
+We anticipate AL can improve game development processes by making playtesting more efficient and cost-effective.
+AL may also inform processes that cannot yet be automated: e.g. using forums or bug reports to identify and prioritize potential design changes.
+Machine--driven playtesting can thus complement the strengths of human game designers by allowing them to focus on high-level design goals while machines handle mundane parameter tweaking.
 
 
 
