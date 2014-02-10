@@ -24,18 +24,17 @@
 
 \author{
 \alignauthor
-anonymous
 %Alexander Zook and Mark O. Riedl\\
 %       \affaddr{School of Interactive Computing, College of Computing}\\
 %       \affaddr{Georgia Institute of Technology}\\
 %       \affaddr{Atlanta, Georgia, USA}\\
 %       \email{\{a.zook, riedl\}@gatech.edu}
 %
-%Alexander Zook, Eric Fruchter and Mark O. Riedl\\
-%       \affaddr{School of Interactive Computing, College of Computing}\\
-%       \affaddr{Georgia Institute of Technology}\\
-%       \affaddr{Atlanta, Georgia, USA}\\
-%       \email{\{a.zook, efruchter, riedl\}@gatech.edu}
+Alexander Zook, Eric Fruchter and Mark O. Riedl\\
+       \affaddr{School of Interactive Computing, College of Computing}\\
+       \affaddr{Georgia Institute of Technology}\\
+       \affaddr{Atlanta, Georgia, USA}\\
+       \email{\{a.zook, efruchter, riedl\}@gatech.edu}
 }
 
 
@@ -90,7 +89,7 @@ Minimizing the number of inputs tested minimizes the number of playtests perform
 This paper makes three contributions toward machine--driven playtesting:
 \begin{enumerate}
 \item Formulating efficient playtesting as an AL problem
-\item Defining a set of playtesting goals in terms of AL metrics
+\item Defining several common playtesting goals in terms of AL metrics
 \item Demonstrating the efficacy of AL to reduce the number of playtests needed to optimize (1) difficulty-related and (2) control-related game parameters in a case study of a shoot-`em-up game
 \end{enumerate}
 
@@ -146,7 +145,7 @@ Smith et al. \cite{smith2013:quantify-play}, Butler et al. \cite{butler2013:prog
 Jaffe et al. \cite{jaffe2012:balance} use game-theoretic analysis to understand the effects of game design parameters on competitive game balance.
 
 % differences of playtest vs model-check -> value to designers
-Our approach to automated playtesting is intended to complement these approaches to high-level early design exploration with low-level optimization of game parameters and tuning.
+Our approach to automated playtesting complements these approaches to high-level early design exploration with low-level optimization of game parameters and tuning.
 Further, we focus on a generic technique that applies to cases with human testers in the loop, crucial to tuning game controls or subjective features of games.
 %
 Offline design tools currently enable designers to formally define and enforce properties of a game design across all possible player behaviors in a specific game or space of designs.
@@ -192,7 +191,7 @@ There are other uses of AL in games.
 % previous AL approaches
 Normoyle et al. \cite{normoyle2012:al-metrics} use AL to recommend sets of useful player metrics to track.
 Rafferty et al. \cite{rafferty2012:opt-cog-game} optimize game designs offline to learn the most about player cognition.
-Our approach complements prior uses of AL for game design by focusing on efficiently improving designs for player behavior and experience.
+Machine--driven playtesting complements prior uses of AL for game design by focusing on efficiently improving designs for player behavior and experience.
 We extend these efforts with a wider variety of AL methods while addressing the cost of playtesting.
 
 
@@ -201,7 +200,7 @@ We extend these efforts with a wider variety of AL methods while addressing the 
 \section{Playtesting as Active Learning}
 
 Our goal is to automate mundane playtesting tasks by efficiently choosing game design parameters for players to test.
-Active learning provides a generic set of techniques to guide the playtesting process of choosing a set of design parameters to test toward achieving a design goal.
+Active learning provides a generic set of techniques to perform the playtesting process of choosing a set of design parameters to test toward achieving a design goal.
 Playtesting typically involves trade-offs between testing designs that are poorly understood (exploration) and refining designs that are known to be good but need minor changes (exploitation).
 Active learning captures this intuition through explicit models of the exploration-exploitation trade-off.
 In this section we characterize playtesting in terms of AL.
@@ -330,7 +329,7 @@ These acquisition functions have been developed for classification models; sever
 \end{figure}
 
 We sought to assess how well AL could reduce the number of playtests needed to achieve a design goal.
-To conduct a case study of machine--driven playtesting we developed a simple shoot-`em-up game (Figure \ref{fig:shmup}).
+To conduct a case study of machine--driven playtesting we developed a simple shoot-`em-up game (Figure~\ref{fig:shmup}).
 Shoot-`em-up games emphasize reflexes and pattern recognition abilities as a player maneuvers a ship to dodge enemy shots and return fire.
 %
 In general, arcade games serve as an ideal starting domain for low-level parameter tuning:
@@ -379,8 +378,9 @@ We provided a fourth option of ``no difference'' for when players could not dist
 Our experiments tested whether AL could reduce the number of human playtests needed to tune design parameters compared to a random sampling approach.
 Random sampling is the standard baseline used to evaluate the efficacy of AL models for improving an objective function for a fixed number of inputs \cite{settles2012:al-book}. 
 Random sampling is similar to A/B testing approaches that capture large amounts of data before acting on the results.
+Randomizing parameter ordering helps control for player learning over waves.
 
-In two experiments we used the AL acquisition functions given above for regression by tuning enemy parameters and for classification by tuning player controls, respectively.
+In two experiments we used the above AL acquisition functions for regression by tuning enemy parameters and for classification by tuning player controls, respectively.
 For both experiments we first built a data set by providing human players with random sets of parameters and recording behavior or subjective responses, respectively.
 The experiments had AL methods use this data as a pool of potential playtests to run and evaluated how well AL could pick a sequence of playtests to best achieve the design goals.
 %Both experiments involved a preliminary test on simulated data followed by testing with human participants.
@@ -472,7 +472,7 @@ For classification we trained a GP, KSVM, or NE (design model) with four control
 %We discarded ratings that were not in these two classes as our data had too few samples to make a comparison (only 10/57 players ever responded in other categories).
 
 
-For each cross-validation fold we first randomly selected 10\% of the data and set it aside set aside for evaluating objective function performance.
+For each cross-validation fold we first randomly selected 10\% of the data and set it aside for evaluating objective function performance.
 %randomly selected 300 data points to use for cross-validation; the remaining data was used as .
 Next we randomly sampled 30 input--output pairs from the other 90\% of the data set to create a training data set; the remaining unused samples formed the training pool.
 %An additional set of 500 testing points was generated in the same way.
@@ -517,7 +517,7 @@ Below we provide further details with an emphasis on how AL impacted the need fo
 
 Our regression experiments show AL can effectively tune for players having a desired level of performance, even with few samples.
 Having a clear behavioral objective (being hit a number of times in the game) was likely a strong contributor.
-We found UCB was most effective (Table \ref{tab:reg_res}).
+We found UCB was most effective (Table~\ref{tab:reg_res}).
 UCB explicitly balances exploring and exploiting potential test designs, suggesting parameter tuning objectives involve a balance between considering alternative parameter settings and refining a given setting.
 
 
@@ -529,16 +529,16 @@ UCB explicitly balances exploring and exploiting potential test designs, suggest
 % -- variance and PI do not capture exploration and thus have difficulty finding good results
 % -- UCB is able to temper exploration and exploitation over time, likely helping focus on best areas to test
 AL methods that do not balance exploration and exploitation had worse performance either with few or many samples.
-Figure \ref{fig:reg_happy} shows MSE values (higher is worse performance) for different acquisition functions, illustrating the better performance of all methods over random sampling; Table \ref{tab:reg_res} provides values at selected regions.
-Figure \ref{fig:reg_all} shows how much different acquisition functions reduced MSE compared to a baseline random sampling approach (larger values indicate greater improvements).
-From these figures it is clear AL generally is particularly advantageous at small sample sizes, though most methods show improvements up to the maximum number of samples used.
+Figure~\ref{fig:reg_happy} shows MSE values (higher is worse performance) for model predictions when trained with different acquisition functions, illustrating the better performance of all AL methods over random sampling; Table~\ref{tab:reg_res} provides values at selected regions.
+Figure~\ref{fig:reg_all} shows how much different acquisition functions reduced MSE compared to a baseline random sampling approach (larger values indicate greater improvements).
+From these figures it is clear AL is particularly advantageous at small sample sizes, though most methods show improvements up to the maximum number of samples used.
 
 
 Variance performed relatively better with many samples, explained by the need to explore heavily before having a good enough design model.
 When tuning many parameters at once it is easy to find many sets of uncertain (but bad) parameters, leading to poor performance with few samples.
 Over time EI gradually worsened while UCB and variance maintained better performance.
 As more samples are gathered UCB reduces exploration while EI eventually begins to make poor playtest choices.
-Approximately 70 samples were needed to train the successful AL methods for the largest peak performance improvements; random sampling never achieved this level of performance on our data set (Table \ref{tab:reg_res}).
+Approximately 70 samples were needed to train the successful AL methods for the largest peak performance improvements; random sampling never achieved this level of performance on our data set (Table~\ref{tab:reg_res}).
 Overall this clearly demonstrates AL can enhance playtesting efficacy, perhaps beyond what would happen through simply A/B testing and collecting data as suggested by the asymptotically higher performance of UCB and variance.
 
 % summary
@@ -554,7 +554,7 @@ These results make a strong case for AL applied to optimizing low-level in-game 
 \caption{GP performance using different acquisition functions.
 Shows MSE with an increasing pool of AL-selected training samples.
 Lower values indicate better performance.
-Bands indicate values that were averaged to produce Table \ref{tab:reg_res}.
+Bands indicate values that were averaged to produce Table~\ref{tab:reg_res}.
 }
 \label{fig:reg_happy}
 \end{figure}
@@ -576,30 +576,20 @@ Lower values indicate better performance.}
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-acquisition function & 80 samples   & 280 samples  \\ \hline
-random               & 260          & 239          \\ \hline
-variance             & 231          & \textbf{228} \\ \hline
-PI                   & 253          & 236          \\ \hline
-EI                   & \textbf{215} & 242          \\ \hline
-UCB                  & \textbf{204} & \textbf{224} \\ \hline
+acquisition function & 65 samples   & 280 samples  \\ \hline
+random               & 268          & 239          \\ \hline
+variance             & 233          & \textbf{228} \\ \hline
+PI                   & 255          & 236          \\ \hline
+EI                   & \textbf{210} & 242          \\ \hline
+UCB                  & \textbf{203} & \textbf{224} \\ \hline
 \end{tabular}
-%\begin{tabular}{|c|c|l|c|l|}
-%\hline
-%\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}acquisition\\ function\end{tabular}}} & \multicolumn{2}{|c|}{simulation}                  & \multicolumn{2}{|c|}{human data}                 \\ \cline{2-5} 
-%\multicolumn{1}{|l|}{}                                                                   & \multicolumn{1}{|l|}{\textbf{80}} & \textbf{280}  & \multicolumn{1}{|l|}{\textbf{80}} & \textbf{280} \\ \hline
-%random                                                                                   & 1.91                              & 1.36          & 136                               & 124          \\ \hline
-%variance                                                                                 & 1.50                              & 1.39          & 121                               & 120          \\ \hline
-%PI                                                                                       & 8.32                              & 6.38          & 133                               & 123          \\ \hline
-%EI                                                                                       & 1.60                              & \textbf{1.30} & 112                               & 127          \\ \hline
-%UCB                                                                                      & \textbf{1.48}                     & 1.38          & \textbf{107}                      & \textbf{117} \\ \hline
-%\end{tabular}
 \label{tab:reg_res}
 \end{table}
 
 
 \subsection{Classification}
 Our classification experiments show AL improves models of subjective player preferences with both probabilistic and non-probabilistic acquisition functions.
-Methods that tolerate high variance---entropy, QBB vote and probability, and expected error reduction---have the strongest performance (Table \ref{tab:cls_res}).
+Methods that tolerate high variance---entropy, QBB vote and probability, and expected error reduction---have the strongest performance (Table~\ref{tab:cls_res}).
 These acquisition functions succeed by overcoming the noise inherent in human playtest data, particularly when using few playtests.
 Performance increases with few playtests means AL may be particularly effective in cases where playtesting time or resource budget is limited.
 Our results show AL methods are effective even with more complex data and can improve a variety of baseline classification design models (called classifiers---GPs, KSVMs, and NE).
@@ -613,9 +603,9 @@ Our results show AL methods are effective even with more complex data and can im
 %		NE: no difference
 %		KSVM: QBB vote early improvement
 Entropy, QBB vote and probability, and error reduction all improved classification quality (as F1 score) over random sampling.
-%Figure \ref{fig:cls_all} shows the amount of performance improvement for the best-improving acquisition functions for each classifier; Table \ref{tab:cls_res} shows the raw F1 scores.
-Figure \ref{fig:cls_happy} shows F1 scores (higher is better performance) for the best performing acquisition functions for each classifier; Table \ref{tab:cls_res} provides values at selected regions.
-Figure \ref{fig:cls_all} shows how much different acquisition functions increased F1 scores compared to a baseline random sampling approach using the same classifier (larger values indicate greater improvements).
+%Figure~\ref{fig:cls_all} shows the amount of performance improvement for the best-improving acquisition functions for each classifier; Table \ref{tab:cls_res} shows the raw F1 scores.
+Figure~\ref{fig:cls_happy} shows F1 scores (higher is better performance) for the best performing acquisition functions for each classifier; Table~\ref{tab:cls_res} provides values at selected regions.
+Figure~\ref{fig:cls_all} shows how much different acquisition functions increased F1 scores compared to a baseline random sampling approach using the same classifier (larger values indicate greater improvements).
 These figures illustrate AL can provide substantial gains with few samples and maintain an improvement over random sampling up to the maximum number of samples used.
 
 QBB methods (especially vote) were effective at both few and many samples.
@@ -643,7 +633,7 @@ AL always improved over random sampling across different design model approaches
 \caption{Classification performance with different combinations of classifiers and acquisition functions.
 Higher values indicate better performance.
 Shows F1 score with an increasing pool of AL-selected training samples.
-Bands indicate values that were averaged to produce Table \ref{tab:cls_res}.
+Bands indicate values that were averaged to produce Table~\ref{tab:cls_res}.
 Only the best-performing acquisition functions for each classifier are shown for clarity.
 %The only random sampling shown is using a GP as this had the best performance.
 }
